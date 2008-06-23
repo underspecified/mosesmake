@@ -1,0 +1,20 @@
+#!/usr/local/plan9/bin/rc
+
+fn moses_fact2pos {
+	awk '
+	BEGIN {
+		ORS = ""
+	}
+	{
+		surface = 1
+		lemma = 2
+		pos = 3
+		for (i=1; i<=NF; i++) {
+			split($i, data, "|")
+			printf "%s ", data[pos]
+		}
+		print "\n"
+	}'
+}
+
+moses_fact2pos

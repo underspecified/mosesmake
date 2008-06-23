@@ -1,0 +1,111 @@
+#!/usr/local/plan9/bin/rc
+
+fn moses_cp_data {	
+	mkdir -p $system $corpus_dir $lm_dir $model_dir $tuning_dir $eval_dir
+	cp -f $training_src_file $train_stem.$src
+	cp -f $training_tgt_file $train_stem.$tgt
+	cp -f $dev_src_file $tuning_in_stem
+	cp -f $dev_tgt_file $tuning_ref_stem
+	cp -f $test_src_file $eval_in_stem
+	cp -f $test_tgt_file $eval_ref_stem
+	cp -f $lm_file $lm_stem
+
+	echo '#' find $system
+	find $system | sort
+}
+
+fn usage {
+	echo 'usage: moses_all [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>] <training_src_file> <training_tgt_file> <dev_src_file> <dev_tgt_file> <test_src_file> <test_tgt_file> <lm_file>' >[1=2]
+	exit 1
+}
+
+echo moses_all $* > command.tmp
+
+root = `{pwd}
+factors = factorless
+while (~ $1 -*) {
+	switch($1) {
+		case -c --corpus
+			corpus = $2
+			shift 2
+		case -f --factors
+			factors = $2
+			shift 2
+		case -l --lm-corpus
+			lm_corpus = $2
+			shift 2
+		case -r --root
+			root = $2
+			shift 2
+		case -s --src
+			src = $2
+			shift 2			
+		case -t --tgt
+			tgt = $2
+			shift 2
+		case *
+			echo malformed flag $1 ! >[1=2]
+			usage
+			exit 1
+	}
+}
+
+if (~ $src '' || ~ $tgt '' || ~ $corpus '' || ~ $lm_corpus '' || ~ $factors '' || ~ $root '') {
+	echo '$src, $tgt, $corpus, $lm_corpus, $factors, and $root must be set!' >[1=2]
+	usage
+	exit 1
+}
+
+. $MHOME/env/moses.env
+
+time_log = $system/time.log.$pid
+fn time_log {
+    echo '#' $* >> $time_log
+    time -a -o $time_log $*
+}
+
+mkdir -p $system
+mv command.tmp $system/command.txt
+rm -f $time_log
+echo `{date} > $time_log
+
+echo 'corpus='^$corpus > $system/command.env
+echo 'lm_corpus='^$lm_corpus >> $system/command.env
+echo 'factors='^$factors >> $system/command.env
+echo 'root='^$root >> $system/command.env
+echo 'src='^$src >> $system/command.env
+echo 'tgt='^$tgt >> $system/command.env
+
+switch($#*) {
+	case 7
+		training_src_file = $1
+		training_tgt_file = $2
+		dev_src_file = $3
+		dev_tgt_file = $4
+		test_src_file = $5
+		test_tgt_file = $6
+		lm_file = $7
+		
+		if (9 test -e $training_src_file -a -e $training_tgt_file -a \
+				   -e $dev_src_file -a -e $dev_tgt_file -a \
+				   -e $test_src_file -a -e $test_tgt_file -a \
+				   -e $lm_file) {
+			. $MHOME/env/moses.env
+		        moses_cp_data
+			time_log moses_prepare_data
+		        time_log moses_build_lm
+			time_log moses_train_am
+		        time_log moses_tune_am
+			time_log moses_evaluate
+		}
+		if not {
+			echo necessary files don''t exist! >[1=2]
+			usage
+			exit 1
+		}
+		
+	case *
+		echo missing necessary arguments! >[1=2]
+		usage
+		exit 1
+}

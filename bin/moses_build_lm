@@ -1,0 +1,72 @@
+#!/usr/local/plan9/bin/rc
+
+fn moses_srilm_kn {
+	ngram-count -order 5 -interpolate -kndiscount -text $1 -lm $2
+}
+
+fn moses_srilm_wb {
+	ngram-count -order 5 -interpolate -wbdiscount -text $1 -lm $2
+}
+
+fn moses_build_lm {	
+	if (! 9 test -e $lm_tok -a -e $lm_pos)
+		moses_process_data $lm_stem $tgt
+	
+	if (! 9 test -e $surface_lm) {
+		echo -n Building language model $surface_lm ...
+		moses_srilm_kn $lm_tok $surface_lm
+		echo done.
+	}
+	
+	if (! 9 test -e $pos_lm) {
+		echo -n Building language model $pos_lm ...
+		moses_srilm_wb $lm_pos $pos_lm
+		echo done.
+	}
+}
+
+fn usage {
+	echo 'usage: moses_build_lm [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>]' >[1=2]
+}
+
+if (! ~ $#* 0) {
+	has_args = true
+	factors = factorless
+}
+
+while (~ $1 -*) {
+	switch($1) {
+		case -c --corpus
+			corpus = $2
+			shift 2
+		case -f --factors
+			factors = $2
+			shift 2
+		case -l --lm-corpus
+			lm_corpus = $2
+			shift 2
+		case -r --root
+			root = $2
+			shift 2
+		case -s --src
+			src = $2
+			shift 2			
+		case -t --tgt
+			tgt = $2
+			shift 2
+		case *
+			echo malformed flag $1 ! >[1=2]
+			usage
+			exit 1
+	}
+}
+
+if (~ $src '' || ~ $tgt '' || ~ $corpus '' || ~ $lm_corpus '' || ~ $factors '' || ~ $root '') {
+	echo '$src, $tgt, $corpus, $lm_corpus, $factors, and $root must be set!' >[1=2]
+	usage
+	exit 1
+}
+if not {
+	if (! ~ $has_args '') . $MHOME/env/moses.env
+	moses_build_lm
+}

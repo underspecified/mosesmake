@@ -1,0 +1,24 @@
+#!/bin/bash
+
+filter_with_grammar () {
+	awk '
+	BEGIN {
+		FS = "\t"
+		dict_name = ARGV[1]
+		ARGV[1] = "-"
+		while (getline w <dict_name > 0) {
+			dict[w] = "true"
+		}
+	}
+	{
+		entry = $0
+		if (entry in dict) {
+			print
+		}
+		else {
+			print | "cat 1>&2"
+		}
+	}' $*
+}
+
+filter_with_grammar $*

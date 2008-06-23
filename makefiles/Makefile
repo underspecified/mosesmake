@@ -1,0 +1,21 @@
+%.en.fact:		%.en
+	moses_factorize_corpus en < $< > $@
+
+%.ja.fact:		%.ja
+	moses_factorize_corpus ja < $< > $@
+
+%.lc:		%.fact
+	moses_lowercase < $< > $@
+
+%.tok:	%.lc
+	moses_fact2tok < $< > $@
+
+%.pos:	%.lc
+	moses_fact2pos < $< > $@
+
+.SECONDARY:
+
+.PHONY:	clean
+clean:
+	rm -f *.fact *.lc *.tok *.pos
+

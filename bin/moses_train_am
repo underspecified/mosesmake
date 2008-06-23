@@ -1,0 +1,102 @@
+#!/usr/local/plan9/bin/rc
+
+fn moses_train_factorless_am {
+	if (! 9 test -e $model_dir/moses.ini) {
+		echo -n Training alignment model ...
+		train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train_lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 
+		echo done.
+	}
+}
+
+fn moses_train_pos_am {
+	if (! 9 test -e $model_dir/moses.ini) {
+		echo -n Training alignment model ...
+		train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train_lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 0-0,2
+		echo done.
+	}
+}
+
+fn moses_train_pos-gen_am {
+        if (! 9 test -e $model_dir/moses.ini) {
+                echo -n Training alignment model ...
+                train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train_lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 0-0 --generation-factors 0-2 --decoding-steps t0,g0
+
+                echo done.
+        }
+}
+
+fn moses_train_lemma+pos+morph_am {
+	if (! 9 test -e $model_dir/moses.ini) {
+		echo -n Training alignment model ...
+		train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train_lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 1-1+3-2 --generation-factors 1-2+1,2-0 --decoding-steps t0,g0,t1,g1
+		echo done.
+	}
+}
+
+fn moses_train_surface+lemma+pos+morph_am {
+	if (! 9 test -e $model_dir/moses.ini) {
+		echo -n Training alignment model ...
+		train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train_lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 1-1+3-2+0-0,2 --generation-factors 1-2+1,2-0 --decoding-steps t0,g0,t1,g1:t2
+		echo done.
+	}
+}
+
+fn usage {
+	echo 'usage: moses_train_am [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>]' >[1=2]
+}
+
+if (! ~ $#* 0) {
+	has_args = true
+	factors = factorless
+}
+while (~ $1 -*) {
+	switch($1) {
+		case -c --corpus
+			corpus = $2
+			shift 2
+		case -f --factors
+			factors = $2
+			shift 2
+		case -l --lm-corpus
+			lm_corpus = $2
+			shift 2
+		case -r --root
+			root = $2
+			shift 2
+		case -s --src
+			src = $2
+			shift 2			
+		case -t --tgt
+			tgt = $2
+			shift 2
+		case *
+			echo malformed flag $1 ! >[1=2]
+			usage
+			exit 1
+	}
+}
+
+if (~ $src '' || ~ $tgt '' || ~ $corpus '' || ~ $lm_corpus '' || ~ $factors '' || ~ $root '') {
+	echo '$src, $tgt, $corpus, $lm_corpus, $factors, and $root must be set!' >[1=2]
+	usage
+	exit 1
+}
+if not {
+	if (! ~ $has_args '') . $MHOME/env/moses.env
+
+	switch($factors) {
+		case factorless
+			moses_train_factorless_am
+		case pos
+			moses_train_pos_am
+		case pos-gen
+			moses_train_pos-gen_am
+		case lemma+pos+morph
+			moses_train_lemma+pos+morph_am
+		case surface+lemma+pos+morph
+			moses_train_surface+lemma+pos+morph_am
+		case *
+			echo don''t know how to make alignment model for factors: $factors >[1=2]
+			exit 1
+	}
+}

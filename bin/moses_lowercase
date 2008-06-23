@@ -1,0 +1,7 @@
+#!/usr/local/plan9/bin/rc
+
+fn moses_lowercase {
+	lowercase.perl
+}
+
+moses_lowercase

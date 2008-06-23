@@ -1,0 +1,74 @@
+#!/usr/local/plan9/bin/rc
+
+fn moses_tune_am {
+	switch($factors){
+		case factorless pos pos-gen
+			suf = tok
+		case *
+			suf = lc
+	}
+
+	if (! 9 test -s $tuning_in_fact)
+		moses_process_data $tuning_in_stem $src
+
+	if (! 9 test -s $tuning_ref_fact)
+		moses_process_data $tuning_ref_stem $tgt
+	
+	if (! 9 test -s $tuning_dir/moses.ini) {
+		echo -n Conducting Minimum Error Rate Training ...
+		mert-moses.pl $tuning_in_stem.$suf $tuning_ref_stem.$suf /usr/bin/moses $model_dir/moses.ini --working-dir $tuning_dir --rootdir /usr/share/moses/scripts
+		echo done.
+	}
+	
+	if (! 9 test -s $tuning_dir/moses.weight-reused.ini) {
+		echo -n Saving weights ...
+		reuse-weights.perl $tuning_dir/moses.ini < $model_dir/moses.ini > $tuning_dir/moses.weight-reused.ini
+		echo done.
+	}
+}
+
+fn usage {
+	echo 'usage: moses_tune_am [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>]' >[1=2]
+}
+
+if (! ~ $#* 0) {
+	has_args = true
+	factors = factorless
+}
+
+while (~ $1 -*) {
+	switch($1) {
+		case -c --corpus
+			corpus = $2
+			shift 2
+		case -f --factors
+			factors = $2
+			shift 2
+		case -l --lm-corpus
+			lm_corpus = $2
+			shift 2
+		case -r --root
+			root = $2
+			shift 2
+		case -s --src
+			src = $2
+			shift 2			
+		case -t --tgt
+			tgt = $2
+			shift 2
+		case *
+			echo malformed flag $1 ! >[1=2]
+			usage
+			exit 1
+	}
+}
+
+if (~ $src '' || ~ $tgt '' || ~ $corpus '' || ~ $lm_corpus '' || ~ $factors '' || ~ $root '') {
+	echo '$src, $tgt, $corpus, $lm_corpus, $factors, and $root must be set!' >[1=2]
+	usage
+	exit 1
+}
+if not {
+	if (! ~ $has_args '') . $MHOME/env/moses.env
+	moses_tune_am
+}

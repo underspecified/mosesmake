@@ -1,0 +1,21 @@
+#!/usr/local/plan9/bin/rc
+
+fn tag_with_eos {
+	cmd = $*
+	awk '
+	{
+		print
+		print "EOS"
+	}' |
+	exec $cmd |
+	awk '
+	/EOS/ {
+		print "EOS"
+		next
+	}
+	{
+		print
+	}'
+}
+
+tag_with_eos $*

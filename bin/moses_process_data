@@ -1,0 +1,31 @@
+#!/usr/local/plan9/bin/rc
+
+fn moses_process_data {
+	stem = $1
+	lang = $2
+	sufx = ''
+	if (! ~ $3 '')
+		sufx = .$3
+		
+	# factorize
+	echo moses_factorize_corpus $lang '<' $stem^$sufx '>' $stem.fact^$sufx
+	moses_factorize_corpus $lang < $stem^$sufx > $stem.fact^$sufx
+	
+	# convert to lowercase
+	echo moses_lowercase '<' $stem.fact^$sufx '>' $stem.lc^$sufx
+	moses_lowercase < $stem.fact^$sufx > $stem.lc^$sufx
+	
+	# retrieve tokens
+	echo moses_fact2tok '<' $stem.lc^$sufx '>' $stem.tok^$sufx
+	moses_fact2tok < $stem.lc^$sufx > $stem.tok^$sufx
+	
+	# retrieve POS
+	echo moses_fact2pos '<' $stem.lc^$sufx '>' $stem.pos^$sufx
+	moses_fact2pos < $stem.lc^$sufx > $stem.pos^$sufx
+	
+	# retrieve tokens+POS
+	echo moses_fact2tok+pos '<' $stem.lc^$sufx '>' $stem.tok+pos^$sufx
+	moses_fact2tok+pos < $stem.lc^$sufx > $stem.tok+pos^$sufx	
+}
+
+moses_process_data $*

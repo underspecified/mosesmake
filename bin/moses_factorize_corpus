@@ -1,0 +1,101 @@
+#!/usr/local/plan9/bin/rc
+
+fn eos_record_to_line {
+	awk '
+	BEGIN {
+		RS = "EOS"
+		ORS = ""
+	}
+	{
+		for (i=1; i<=NF; i++) {
+			printf "%s ", $i
+		}
+		print "\n"
+	}' |
+	head -n -1
+}
+
+fn moses_factorize_corpus_ja {
+	tr -d ' ' |
+	mecab8 -F'%m|%M|%F-[0,1]|%F-[4,5]___' |
+	sed 's/___/ /g
+		 s/| /|NULL /g
+		 s/EOS$//g'
+}
+
+fn moses_add_morph_en {
+	awk '
+	BEGIN {
+		surface = 1
+		lemma = 2
+		pos = 3
+		morph = 4
+	}
+	{
+		sent = ""
+		for (i=1; i<=NF; i++) {
+			split($i, data, "|")
+			sent = sent data[surface] "_" data[pos] " "
+			items[i,surface] = data[surface]
+			items[i,lemma] = data[lemma]
+			items[i,pos] = data[pos]
+		}
+		
+		gsub("\"", "\\\"", sent)
+		("echo \"" sent "\" | morpha -a") | getline msent
+		close("echo \"" sent "\" | morpha -a")
+		
+		mlen = split(msent, mtoks, " ")
+		for (j=1; j<=mlen; j++) {
+			mnum = split(mtoks[j], mdata, "+")
+			if (mnum == 2) {
+				items[j,morph] = "+" mdata[2]
+			}
+			else {
+				items[j,morph] = "NULL"
+			}
+		}
+		
+		for (i=1; i<=NF; i++) {
+			printf "%s|%s|%s|%s ", items[i,surface], items[i,lemma], items[i,pos], items[i,morph]
+		}
+		print ""
+	}'
+}
+
+fn moses_factorize_corpus_en {
+	tag_with_eos tree-tagger-english >[2=] |
+	awk '
+	BEGIN {
+		FS = "\t"
+		OFS = "|"
+	}
+	NF >= 3 {
+		surface = $1
+		pos = $2
+		morph = $2
+		lemma = $3
+		print surface, lemma, pos, morph
+	}
+	/^EOS$/' |
+	eos_record_to_line |
+	moses_add_morph_en
+}
+
+fn moses_factorize_corpus {
+	lang = $1
+	switch($lang) {
+		case en
+			moses_factorize_corpus_en
+		case ja
+			moses_factorize_corpus_ja
+	}
+}
+
+switch($#*) {
+	case 1
+		moses_factorize_corpus $1
+	case *
+		echo usage: moses_factorize_corpus language >[1=2]
+		exit 1
+}
