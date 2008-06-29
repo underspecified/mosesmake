@@ -16,7 +16,7 @@ fn moses_prepare_data {
 }
 
 fn usage {
-	echo 'usage: moses_prepare_data [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>]' >[1=2]
+	echo 'usage: moses_prepare_data [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>] [-b|--baseline <baseline_dir> ]' >[1=2]
 }
 
 if (! ~ $#* 0) {

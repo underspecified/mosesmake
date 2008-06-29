@@ -34,7 +34,7 @@ fn moses_tune_am {
 }
 
 fn usage {
-	echo 'usage: moses_tune_am [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>]' >[1=2]
+	echo 'usage: moses_tune_am [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>] [-b|--baseline <baseline_dir> ]' >[1=2]
 }
 
 if (! ~ $#* 0) {
@@ -44,6 +44,9 @@ if (! ~ $#* 0) {
 
 while (~ $1 -*) {
 	switch($1) {
+		case -b --baseline
+			baseline = $2
+			shift 2	
 		case -c --corpus
 			corpus = $2
 			shift 2

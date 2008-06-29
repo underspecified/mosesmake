@@ -15,7 +15,7 @@ fn moses_cp_data {
 }
 
 fn usage {
-	echo 'usage: moses_all [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>] <training_src_file> <training_tgt_file> <dev_src_file> <dev_tgt_file> <test_src_file> <test_tgt_file> <lm_file>' >[1=2]
+	echo 'usage: moses_all [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file>] [-f|--factors <factors>] [-b|--baseline <baseline_output>] <training_src_file> <training_tgt_file> <dev_src_file> <dev_tgt_file> <test_src_file> <test_tgt_file> <lm_file>' >[1=2]
 	exit 1
 }
 
@@ -25,6 +25,9 @@ root = `{pwd}
 factors = factorless
 while (~ $1 -*) {
 	switch($1) {
+		case -b --baseline
+			baseline = $2
+			shift 2
 		case -c --corpus
 			corpus = $2
 			shift 2
@@ -86,10 +89,10 @@ switch($#*) {
 		test_tgt_file = $6
 		lm_file = $7
 		
-		if (9 test -e $training_src_file -a -e $training_tgt_file -a \
-				   -e $dev_src_file -a -e $dev_tgt_file -a \
-				   -e $test_src_file -a -e $test_tgt_file -a \
-				   -e $lm_file) {
+		if (9 test -s $training_src_file -a -s $training_tgt_file -a \
+				   -s $dev_src_file -a -s $dev_tgt_file -a \
+				   -s $test_src_file -a -s $test_tgt_file -a \
+				   -s $lm_file) {
 			. $MHOME/env/moses.env
 		        moses_cp_data
 			time_log moses_prepare_data
