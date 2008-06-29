@@ -93,9 +93,9 @@ switch($#*) {
 			. $MHOME/env/moses.env
 		        moses_cp_data
 			time_log moses_prepare_data
-		        time_log moses_build_lm
+		   	time_log moses_build_lm
 			time_log moses_train_am
-		        time_log moses_tune_am
+		   	time_log moses_tune_am
 			time_log moses_evaluate
 		}
 		if not {

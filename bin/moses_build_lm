@@ -9,16 +9,16 @@ fn moses_srilm_wb {
 }
 
 fn moses_build_lm {	
-	if (! 9 test -e $lm_tok -a -e $lm_pos)
+	if (9 test (! -s $lm_tok) -o (! -s $lm_pos))
 		moses_process_data $lm_stem $tgt
 	
-	if (! 9 test -e $surface_lm) {
+	if (9 test ! -s $surface_lm) {
 		echo -n Building language model $surface_lm ...
 		moses_srilm_kn $lm_tok $surface_lm
 		echo done.
 	}
 	
-	if (! 9 test -e $pos_lm) {
+	if (9 test ! -s $pos_lm) {
 		echo -n Building language model $pos_lm ...
 		moses_srilm_wb $lm_pos $pos_lm
 		echo done.

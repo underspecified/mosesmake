@@ -8,19 +8,19 @@ fn moses_dev_test {
 			suf = lc
 	}
 
-	if (! 9 test -s $eval_in_fact)
+	if (9 test ! -s $eval_in_fact)
 		moses_process_data $eval_in_stem $src
 
-	if (! 9 test -s $eval_ref_fact)
+	if (9 test ! -s $eval_ref_fact)
 		moses_process_data $eval_ref_stem $tgt
 
-	if (! 9 test -s $eval_model_dir/moses.ini) {
+	if (9 test ! -s $eval_model_dir/moses.ini) {
 		echo -n Filering model to fit in memory ...
 		filter-model-given-input.pl $eval_model_dir $tuning_dir/moses.weight-reused.ini $eval_in_stem.lc
 		echo done.
 	}
 	
-	if (! 9 test -s $eval_output) {
+	if (9 test ! -s $eval_output) {
 		echo -n Decoding with Moses ...
 		moses -config $eval_model_dir/moses.ini -input-file $eval_in_stem.$suf > $eval_out_stem.fact
 		moses_fact2tok < $eval_out_stem.fact > $eval_output
@@ -46,19 +46,19 @@ fn moses_bleu {
 }
 
 fn moses_eval {
-	if (! 9 test -e $recaser_dir/moses.ini) {
+	if (9 test ! -s $recaser_dir/moses.ini) {
 		echo -n Training recaser ...
 		moses_train_recaser
 		echo done.
 	}
 	
-	if (! 9 test -e $eval_out_stem.rc) {
+	if (9 test ! -s $eval_out_stem.rc) {
 		echo -n Recasing output ...
 		moses_recase $recaser_dir/moses.ini $eval_output > $eval_output.rc
 		echo done.
 	}
 	
-	if (! 9 test -e $eval_out_stem.detok) {
+	if (9 test ! -s $eval_out_stem.detok) {
 		echo -n Detokenizing output ...
 		moses_detokenize $tgt < $eval_output.rc > $eval_output.detok
 		echo done.

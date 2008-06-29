@@ -14,9 +14,15 @@ fn moses_tune_am {
 	if (! 9 test -s $tuning_ref_fact)
 		moses_process_data $tuning_ref_stem $tgt
 	
-	if (! 9 test -s $tuning_dir/moses.ini) {
+	if (9 test (! -s $tuning_dir/moses.ini) -a -s $tuning_dir/finished_step.txt) {
 		echo -n Conducting Minimum Error Rate Training ...
-		mert-moses.pl $tuning_in_stem.$suf $tuning_ref_stem.$suf /usr/bin/moses $model_dir/moses.ini --working-dir $tuning_dir --rootdir /usr/share/moses/scripts
+		mert-moses.pl --continue $tuning_in_stem.tok $tuning_ref_stem.tok /usr/bin/moses $model_dir/moses.ini --working-dir $tuning_dir --rootdir /usr/share/moses/scripts
+		echo done.
+	}
+
+	if (9 test (! -s $tuning_dir/moses.ini) -a (! -s $tuning_dir/finished_step.txt)) {
+		echo -n Conducting Minimum Error Rate Training ...
+		mert-moses.pl $tuning_in_stem.tok $tuning_ref_stem.tok /usr/bin/moses $model_dir/moses.ini --working-dir $tuning_dir --rootdir /usr/share/moses/scripts
 		echo done.
 	}
 	
