@@ -1,7 +1,7 @@
 #!/usr/local/plan9/bin/rc
 
 fn moses_prepare_data {
-	if (9 test (! -e $train_clean.$src) -o (! -e $train_clean.$tgt)) {
+	if (! 9 test -s $train_clean.$src -a -s $train_clean.$tgt) {
 		echo -n Discarding sentences not between $min and $max words in length ...
 		moses_filter $train_stem $src $tgt $train_clean $min $max
 		mv $train_stem.$src $train_stem.orig.$src && cp $train_clean.$src $train_stem.$src
@@ -9,14 +9,17 @@ fn moses_prepare_data {
 		echo done.
 	}
 
-	if (9 test ! -e $train_fact.$src)
-			moses_process_data $train_stem $src $src
-	if (9 test ! -e $train_fact.$tgt)
-			moses_process_data $train_stem $tgt $tgt
+	if (! 9 test -s $train_fact.$src) {
+		moses_process_data $train_stem $src $src
+	}
+
+	if (! 9 test -s $train_fact.$tgt) {
+		moses_process_data $train_stem $tgt $tgt
+	}
 }
 
 fn usage {
-	echo 'usage: moses_prepare_data [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>] [-b|--baseline <baseline_dir> ]' >[1=2]
+	echo 'usage: moses_prepare_data [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file>] [-f|--factors <factors>] [-b|--baseline <baseline_output>]' >[1=2]
 }
 
 if (! ~ $#* 0) {
@@ -26,6 +29,9 @@ if (! ~ $#* 0) {
 
 while (~ $1 -*) {
 	switch($1) {
+		case -b --baseline
+			baseline = $2
+			shift 2
 		case -c --corpus
 			corpus = $2
 			shift 2

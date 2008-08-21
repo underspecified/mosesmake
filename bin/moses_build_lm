@@ -9,16 +9,17 @@ fn moses_srilm_wb {
 }
 
 fn moses_build_lm {	
-	if (9 test (! -s $lm_tok) -o (! -s $lm_pos))
+	if (! 9 test -s $lm_tok -a -s $lm_pos) {
 		moses_process_data $lm_stem $tgt
+	}
 	
-	if (9 test ! -s $surface_lm) {
+	if (! 9 test -s $surface_lm) {
 		echo -n Building language model $surface_lm ...
 		moses_srilm_kn $lm_tok $surface_lm
 		echo done.
 	}
 	
-	if (9 test ! -s $pos_lm) {
+	if (! 9 test -s $pos_lm) {
 		echo -n Building language model $pos_lm ...
 		moses_srilm_wb $lm_pos $pos_lm
 		echo done.
@@ -26,7 +27,7 @@ fn moses_build_lm {
 }
 
 fn usage {
-	echo 'usage: moses_build_lm [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>] [-b|--baseline <baseline_dir> ]' >[1=2]
+	echo 'usage: moses_build_lm [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file>] [-f|--factors <factors>] [-b|--baseline <baseline_output>]' >[1=2]
 }
 
 if (! ~ $#* 0) {

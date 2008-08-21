@@ -1,16 +1,24 @@
 #!/usr/local/plan9/bin/rc
 
 fn moses_eval_setup {
-	if (9 test ! -s $eval_in_fact)
+	if (! 9 test -s $eval_in_fact) {
 		moses_process_data $eval_in_stem $src
+	}
 
-	if (9 test ! -s $eval_ref_fact)
-		moses_process_data $eval_ref_stem $tgt	
+	if (! 9 test -s $eval_ref_fact) {
+		moses_process_data $eval_ref_stem $tgt
+	}
+
+	if (! 9 test -s $recaser_dir/moses.ini) {
+		echo -n Training recaser ...
+		train-recaser.perl -train-script /usr/bin/train-factored-phrase-model.perl -ngram-count /usr/bin/ngram-count -corpus $lm_stem.tok -dir $recaser_dir
+		echo done.
+	}
 }
 
 fn moses_dev_test {
 	input = $1
-	output = $2
+	out = $2
 	emdir = $3
 	ini = $4
 
@@ -21,42 +29,35 @@ fn moses_dev_test {
 			suf = lc
 	}
 
-	if (9 test ! -s $emdir/moses.ini) {
-		echo -n Filering model to fit in memory ...
+	if (! 9 test -s $emdir/moses.ini) {
+		echo -n Filtering model to fit in memory ...
+		rm -rf $emdir
 		filter-model-given-input.pl $emdir $ini $input.lc
 		echo done.
 	}
 	
-	if (9 test ! -s $output) {
+	if (! 9 test -s $out) {
 		echo -n Decoding with Moses ...
-		moses -config $emdir/moses.ini -input-file $input.$suf > $output.fact
-		moses_fact2tok < $output.fact > $output
+		moses -config $emdir/moses.ini -input-file $input.$suf > $out.fact
+		moses_fact2tok < $out.fact > $out
 		echo done.
 	}
 	
-	if (9 test ! -s $output.rc) {
+	if (! 9 test -s $out.rc) {
 		echo -n Recasing output ...
-		moses_recase $output > $output.rc
+		moses_recase $out > $out.rc
 		echo done.
 	}
 	
-	if (9 test ! -s $output.detok) {
+	if (! 9 test -s $out.detok) {
 		echo -n Detokenizing output ...
-		moses_detokenize $tgt < $output.rc > $output.detok
+		moses_detokenize $tgt < $out.rc > $out.detok
 		echo done.
 	}
 }
 
 fn moses_recase {
-	input = $1
-	
-	if (9 test ! -s $recaser_dir/moses.ini) {
-		echo -n Training recaser ...
-		train-recaser.perl -train-script /usr/bin/train-factored-phrase-model.perl -ngram-count /usr/bin/ngram-count -corpus $lm_stem.tok -dir $recaser_dir
-		echo done.
-	}
-	
-	recase.perl -model $recaser_dir/moses.ini -in $input -moses /usr/bin/moses
+	recase.perl -model $recaser_dir/moses.ini -in $1 -moses /usr/bin/moses
 }
 
 fn moses_detokenize {
@@ -69,33 +70,34 @@ fn moses_bleu {
 }
 
 fn moses_eval {
-	output = $1
-	reference = $2
-	if (~ $#* 3)
-		baseline = $3
+	out = $1
+	ref = $2
+	if (~ $#* 3) {
+		base = $3
+	}
 
-	echo -n Calculating Bleu score ...
-	moses_bleu $eval_ref_stem $output.detok > $output.bleu
+	echo -n Calculating $mert Bleu score ...
+	moses_bleu $ref $out.detok > $out.bleu
 	echo done.
-	cat $output.bleu
+	cat $out.bleu
 	
-	if (! ~ $baseline '') {
-#		echo -n Calculating statistical significance against $baseline ...
-		moses_eval_sig $output.detok $baseline $reference | 
-		tee $eval_output.sig
+	if (9 test -s $base) {
+#		echo -n Calculating statistical significance against $base ...
+		moses_eval_sig $out.detok $base $ref | 
+		tee $out.sig
 #		echo done.
 	}
 }
 
 fn usage {
-	echo 'usage: moses_evaluate [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>]' >[1=2]
+	echo 'usage: moses_evaluate [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file>] [-f|--factors <factors>] [-b|--baseline <baseline_output>] [-m|--mert]'  >[1=2]
 }
 
 if (! ~ $#* 0) {
 	has_args = true
-	factors = factorless
 }
 
+mert = no_mert
 while (~ $1 -*) {
 	switch($1) {
 		case -b --baseline
@@ -110,6 +112,9 @@ while (~ $1 -*) {
 		case -l --lm-corpus
 			lm_corpus = $2
 			shift 2
+		case -m --mert
+			mert = mert
+			shift 1
 		case -r --root
 			root = $2
 			shift 2
@@ -126,6 +131,11 @@ while (~ $1 -*) {
 	}
 }
 
+if (~ $factors '') {
+	factors = factorless
+
+}
+
 if (~ $src '' || ~ $tgt '' || ~ $corpus '' || ~ $lm_corpus '' || ~ $factors '' || ~ $root '') {
 	echo '$src, $tgt, $corpus, $lm_corpus, $factors, and $root must be set!' >[1=2]
 	usage
@@ -133,10 +143,16 @@ if (~ $src '' || ~ $tgt '' || ~ $corpus '' || ~ $lm_corpus '' || ~ $factors '' |
 }
 if not {
 	if (! ~ $has_args '') . $MHOME/env/moses.env
-	moses_eval_setup
-	moses_dev_test $eval_in_stem $eval_out_stem.no_mert \
-				   $eval_model_dir.no_mert $model_dir/moses.ini
-	moses_dev_test $eval_in_stem $eval_out_stem $eval_model_dir $tuning_dir/moses.ini
-	moses_eval $eval_out_stem.no_mert $eval_ref_stem
-	moses_eval $eval_out_stem $eval_ref_stem $baseline
+	if (~ $mert 'mert') {
+		moses_eval_setup
+		moses_dev_test $eval_in_stem $eval_out_stem $eval_model_dir $tuning_dir/moses.ini
+		moses_eval $eval_out_stem $eval_ref_stem $baseline
+	}
+	if not {
+		moses_eval_setup
+		moses_dev_test $eval_in_stem $eval_out_stem.no_mert \
+					   $eval_model_dir.no_mert $model_dir/moses.ini
+		nmb = `{echo $baseline | sed -r 's/.([^.]+)$/.no_mert.\1/g'}
+		moses_eval $eval_out_stem.no_mert $eval_ref_stem $nmb
+	}
 }

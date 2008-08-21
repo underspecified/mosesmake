@@ -24,8 +24,8 @@ fn moses_process_data {
 	moses_fact2pos < $stem.lc^$sufx > $stem.pos^$sufx
 	
 	# retrieve tokens+POS
-	echo moses_fact2tok+pos '<' $stem.lc^$sufx '>' $stem.tok+pos^$sufx
-	moses_fact2tok+pos < $stem.lc^$sufx > $stem.tok+pos^$sufx	
+#	echo moses_fact2tok+pos '<' $stem.lc^$sufx '>' $stem.tok+pos^$sufx
+#	moses_fact2tok+pos < $stem.lc^$sufx > $stem.tok+pos^$sufx	
 }
 
 moses_process_data $*

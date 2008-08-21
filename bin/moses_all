@@ -11,7 +11,7 @@ fn moses_cp_data {
 	cp -f $lm_file $lm_stem
 
 	echo '#' find $system
-	find $system | sort
+#	find $system | sort
 }
 
 fn usage {
@@ -23,6 +23,7 @@ echo moses_all $* > command.tmp
 
 root = `{pwd}
 factors = factorless
+baseline = ''
 while (~ $1 -*) {
 	switch($1) {
 		case -b --baseline
@@ -63,14 +64,14 @@ if (~ $src '' || ~ $tgt '' || ~ $corpus '' || ~ $lm_corpus '' || ~ $factors '' |
 
 time_log = $system/time.log.$pid
 fn time_log {
-    echo '#' $* >> $time_log
-    time -a -o $time_log $*
+	echo `{date} >> $time_log
+
+	time -a -o $time_log $*
 }
 
 mkdir -p $system
 mv command.tmp $system/command.txt
-rm -f $time_log
-echo `{date} > $time_log
+rm -f $time_log && touch $time_log
 
 echo 'corpus='^$corpus > $system/command.env
 echo 'lm_corpus='^$lm_corpus >> $system/command.env
@@ -78,6 +79,8 @@ echo 'factors='^$factors >> $system/command.env
 echo 'root='^$root >> $system/command.env
 echo 'src='^$src >> $system/command.env
 echo 'tgt='^$tgt >> $system/command.env
+if (! ~ $baseline)
+	echo 'baseline='^$baseline >> $system/command.env
 
 switch($#*) {
 	case 7
@@ -94,12 +97,13 @@ switch($#*) {
 				   -s $test_src_file -a -s $test_tgt_file -a \
 				   -s $lm_file) {
 			. $MHOME/env/moses.env
-		        moses_cp_data
+			moses_cp_data
 			time_log moses_prepare_data
 		   	time_log moses_build_lm
 			time_log moses_train_am
-		   	time_log moses_tune_am
 			time_log moses_evaluate
+		   	time_log moses_tune_am
+			time_log moses_evaluate --mert
 		}
 		if not {
 			echo necessary files don''t exist! >[1=2]

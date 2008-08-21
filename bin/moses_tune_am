@@ -8,25 +8,27 @@ fn moses_tune_am {
 			suf = lc
 	}
 
-	if (! 9 test -s $tuning_in_fact)
+	if (! 9 test -s $tuning_in_fact) {
 		moses_process_data $tuning_in_stem $src
+	}
 
-	if (! 9 test -s $tuning_ref_fact)
+	if (! 9 test -s $tuning_ref_fact) {
 		moses_process_data $tuning_ref_stem $tgt
+	}
 	
+	if (! 9 test -s $tuning_dir/moses.ini -a -s $tuning_dir/finished_step.txt) {
+		echo -n Conducting Minimum Error Rate Training ...
+		mert-moses.pl $tuning_in_stem.tok $tuning_ref_stem.tok /usr/bin/moses $model_dir/moses.ini --working-dir $tuning_dir --rootdir /usr/share/moses/scripts
+		echo done.
+	}
+
 	if (9 test (! -s $tuning_dir/moses.ini) -a -s $tuning_dir/finished_step.txt) {
 		echo -n Conducting Minimum Error Rate Training ...
 		mert-moses.pl --continue $tuning_in_stem.tok $tuning_ref_stem.tok /usr/bin/moses $model_dir/moses.ini --working-dir $tuning_dir --rootdir /usr/share/moses/scripts
 		echo done.
 	}
-
-	if (9 test (! -s $tuning_dir/moses.ini) -a (! -s $tuning_dir/finished_step.txt)) {
-		echo -n Conducting Minimum Error Rate Training ...
-		mert-moses.pl $tuning_in_stem.tok $tuning_ref_stem.tok /usr/bin/moses $model_dir/moses.ini --working-dir $tuning_dir --rootdir /usr/share/moses/scripts
-		echo done.
-	}
 	
-	if (! 9 test -s $tuning_dir/moses.weight-reused.ini) {
+	if (! 9 test -s $tuning_dir/moses.ini) {
 		echo -n Saving weights ...
 		reuse-weights.perl $tuning_dir/moses.ini < $model_dir/moses.ini > $tuning_dir/moses.weight-reused.ini
 		echo done.
@@ -34,7 +36,7 @@ fn moses_tune_am {
 }
 
 fn usage {
-	echo 'usage: moses_tune_am [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file> ] [-f|--factors <factors>] [-b|--baseline <baseline_dir> ]' >[1=2]
+	echo 'usage: moses_tune_am [-s|--src en|es|ja] [-t|--tgt en|es|ja] [-r|--root <root_dir>] [-c|--corpus <corpus_name>] [-l|--lm-corpus <lm_corpus_file>] [-f|--factors <factors>] [-b|--baseline <baseline_output> ]' >[1=2]
 }
 
 if (! ~ $#* 0) {

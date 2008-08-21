@@ -1,36 +1,39 @@
-#!/usr/local/plan9/bin/rc
+#!/bin/bash
 	
-fn moses_eval_significance {
-	tgt1 = $1
-	tgt2 = $2
-	ref = $3
+moses_eval_significance () {
+	tgt1=$1
+	tgt2=$2
+	ref=$3
 	
 	echo '*** BLEU score for document ***'
-	command_doc = doc_bleu.rb $tgt1 $ref
+	command_doc="doc_bleu.rb $tgt1 $ref"
 	echo $command_doc
 	$command_doc
 	
 #	echo
 #	echo '*** BLEU score for each line ***'
-#	command_line = line_bleu.rb -ngram 1:4 $tgt1 $ref
+#	command_line="line_bleu.rb -ngram 1:4 $tgt1 $ref"
 #	echo $command_line
 #	$command_line
 	
 	echo
 	echo '*** Confidence Interval ***'
-	command_confiv = confiv.rb 131 1000 95 $tgt1 $ref
+	r1=$RANDOM
+	command_confiv="confiv.rb $r1 1000 95 $tgt1 $ref"
 	echo $command_confiv
 	$command_confiv
 	
-	echo
-	echo '*** Binomial testing ***'
-	command_binom = binom.rb 131 5 50 $tgt1 $tgt2 $ref
-	echo $command_binom
-	$command_binom
+#	echo
+#	echo '*** Binomial testing ***'
+#	r2=$RANDOM
+#	command_binom="binom.rb $r2 5 100 $tgt1 $tgt2 $ref"
+#	echo $command_binom
+#	$command_binom
 	
 	echo
 	echo '*** Bootstrap testing ***'
-	command_bootstrap = bootstrap.rb 131 100 $tgt1 $tgt2 $ref
+	r3=$RANDOM
+	command_bootstrap="bootstrap.rb $r3 1000 $tgt1 $tgt2 $ref"
 	echo $command_bootstrap
 	$command_bootstrap
 }
