@@ -1,23 +1,35 @@
-%.en.fact:		%.en
-	moses_factorize_corpus en < $< > $@
+#!/usr/bin/make
 
-%.ja.fact:		%.ja
-	moses_factorize_corpus ja < $< > $@
+clean:
+	rm -f *.clean.* *.fact.* *.lc.* *.tok.* *.pos.*
 
-%.lc:		%.fact
+%.clean.$(src) %.clean.$(tgt):	%.$(src) %.$(tgt)
+	moses_filter $* $(src) $(tgt) $*.clean $(min) $(max)
+
+%.fact.$(src):	%.clean.$(src)
+	moses_factorize_corpus $(src) < $< > $@
+
+%.fact.$(tgt):	%.clean.$(tgt)
+	moses_factorize_corpus $(tgt) < $< > $@
+
+%.lc.$(src):	%.fact.$(src)
 	moses_lowercase < $< > $@
 
-%.tok:	%.lc
+%.lc.$(tgt):	%.fact.$(tgt)
+	moses_lowercase < $< > $@
+
+%.tok.$(src):	%.lc.$(src)
 	moses_fact2tok < $< > $@
 
-%.pos:	%.lc
-	moses_fact2pos < $< > $@
+%.tok.$(tgt):	%.lc.$(tgt)
+	moses_fact2tok < $< > $@
 
-%.lm:	
+%.pos.$(src):	%.lc.$(src)
+	moses_fact2pos < $< > $@	
+
+%.pos.$(tgt):	%.lc.$(tgt)
+	moses_fact2pos < $< > $@	
 
 .SECONDARY:
 
-.PHONY:	%.clean
-
-%.clean:
-	rm -f $*.fact $*.lc $*.tok $*.pos
+.PHONY: clean

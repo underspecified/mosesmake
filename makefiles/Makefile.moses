@@ -1,0 +1,12 @@
+#!/usr/bin/make
+
+include Makefile.vars
+
+all:	corpus
+
+%:	$MHOME/makefiles/Makefile.%
+	mkdir -p $*
+	cp $MHOME/makefiles/Makefile.$* $*/Makefile
+	cd $* && make
+
+.PHONY: all clean nuke
