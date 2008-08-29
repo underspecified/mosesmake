@@ -1,5 +1,7 @@
 #!/usr/bin/make
 
+include ../Makefile.vars
+
 clean:
 	rm -f *.clean.* *.fact.* *.lc.* *.tok.* *.pos.*
 

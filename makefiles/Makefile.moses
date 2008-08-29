@@ -9,4 +9,7 @@ all:	corpus
 	cp $MHOME/makefiles/Makefile.$* $*/Makefile
 	cd $* && make
 
+nuke:
+	rm -rf corpus
+
 .PHONY: all clean nuke

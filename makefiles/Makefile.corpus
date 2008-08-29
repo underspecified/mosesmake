@@ -1,9 +1,16 @@
 #!/usr/bin/make
 
 include ../Makefile.vars
-inclue $MHOME/makefiles/Makefile.fact
 
-all:	clean $(corpus).train.pos.$(src) $(corpus).train.tok.$(src) \
-			  $(corpus).train.pos.$(tgt) $(corpus).train.tok.$(tgt)
+all:	$(corpus).train.$(src) $(corpus).train.pos.$(src) $(corpus).train.tok.$(src) \
+		$(corpus).train.$(tgt) $(corpus).train.pos.$(tgt) $(corpus).train.tok.$(tgt)
+
+$(corpus).train.$(src):	$(train_src_file)
+	cp $(train_src_file) $(corpus).train.$(src)
+
+$(corpus).train.$(tgt):	$(train_tgt_file)
+	cp $(train_tgt_file) $(corpus).train.$(tgt)
+
+include $(MHOME)/makefiles/Makefile.fact
 
 .PHONY:	all
