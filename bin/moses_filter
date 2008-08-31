@@ -1,13 +1,15 @@
-#!/usr/local/plan9/bin/rc
+#!/bin/bash
 
-fn moses_filter {
-	clean-corpus-n.perl $* >[2=]
+moses_filter () {
+	clean-corpus-n.perl $* 2>/dev/null
 }
 
-switch($#*) {
-	case 6
+case $# in
+	6)
 		moses_filter $*
-	case *
-		echo usage: moses_filter tokenized_files src tgt clean_files min max >[1=2]
+	;;
+	*)
+		echo usage: moses_filter tokenized_files src tgt clean_files min max 1>&2
 		exit
-}
+	;;
+esac

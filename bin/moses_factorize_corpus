@@ -1,6 +1,6 @@
-#!/usr/local/plan9/bin/rc
+#!/bin/bash
 
-fn eos_record2line {
+eos_record2line () {
 	awk '
 	BEGIN {
 		RS = "EOS"
@@ -15,7 +15,7 @@ fn eos_record2line {
 	head -n -1
 }
 
-fn moses_factorize_corpus_ja {
+moses_factorize_corpus_ja () {
 	tr -d ' ' |
 	mecab8 -F'%m|%M|%F-[0,1]|%F-[4,5]___' |
 	sed 's/___/ /g
@@ -23,21 +23,21 @@ fn moses_factorize_corpus_ja {
 		 s/EOS$//g'
 }
 
-fn protect_char {
+protect_char () {
 	sed 's/$1/*CHAR*/g'
 }
 
-fn restore_char {
+restore_char () {
 	sed 's/*CHAR*/$1/g'
 }
 
-fn moses_fact2tok_pos {
+moses_fact2tok_pos () {
 	moses_fact2tok+pos |
 	protect_char '|' |
 	tr '|' '_'
 }
 
-fn moses_tok_pos2morph {
+moses_tok_pos2morph () {
 	morpha -a |
 	awk '
 	{
@@ -53,11 +53,11 @@ fn moses_tok_pos2morph {
 	restore_char '|'
 }
 
-fn moses_add_morph_en {
-	tee tmp.fact.$pid |
+moses_add_morph_en () {
+	tee tmp.fact.$$ |
 	moses_fact2tok_pos |
-	moses_tok_pos2morph > tmp.morph.$pid
-	paste tmp.fact.$pid tmp.morph.$pid |
+	moses_tok_pos2morph > tmp.morph.$$
+	paste tmp.fact.$$ tmp.morph.$$ |
 	awk '
 	BEGIN {
 		FS = "\t"
@@ -75,11 +75,11 @@ fn moses_add_morph_en {
 		}
 		print ""
 	}'
-	rm -f tmp.*.$pid
+	rm -f tmp.*.$$
 }
 
-fn moses_factorize_corpus_en {
-	tag_with_eos tree-tagger-english >[2=] |
+moses_factorize_corpus_en () {
+	tag_with_eos tree-tagger-english 2>/dev/null |
 	awk '
 	BEGIN {
 		FS = "\t"
@@ -98,20 +98,24 @@ fn moses_factorize_corpus_en {
 	moses_add_morph_en
 }
 
-fn moses_factorize_corpus {
-	lang = $1
-	switch($lang) {
-		case en
+moses_factorize_corpus () {
+	lang=$1
+	case $lang in
+		en)
 			moses_factorize_corpus_en
-		case ja
+		;;
+		ja)
 			moses_factorize_corpus_ja
-	}
+		;;
+	esac
 }
 
-switch($#*) {
-	case 1
+case $# in
+	1)
 		moses_factorize_corpus $1
-	case *
-		echo usage: moses_factorize_corpus language >[1=2]
+	;;
+	*)
+		echo usage: moses_factorize_corpus language 1>&2
 		exit 1
-}
+	;;
+esac

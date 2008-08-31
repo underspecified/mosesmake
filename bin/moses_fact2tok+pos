@@ -1,6 +1,6 @@
-#!/usr/local/plan9/bin/rc
+#!/bin/bash
 
-fn moses_fact2tok+pos {
+moses_fact2tok+pos () {
 	awk '
 	BEGIN {
 		ORS = ""
