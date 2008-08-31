@@ -1,12 +1,4 @@
-#!/usr/local/plan9/bin/rc
-
-fn moses_srilm_kn {
-	ngram-count -order 5 -interpolate -kndiscount -text $1 -lm $2
-}
-
-fn moses_srilm_wb {
-	ngram-count -order 5 -interpolate -wbdiscount -text $1 -lm $2
-}
+#!/bin/bash
 
 fn moses_build_lm {	
 	if (! 9 test -s $lm_tok -a -s $lm_pos) {
