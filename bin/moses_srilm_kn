@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# 5-gram language model with Chen and Goodman's modified Kneser-Ney discounting
+# this is the default smooting method for making LMs
+moses_srilm_kn () {
+	ngram-count -order 5 -interpolate -kndiscount -text $1 -lm $2
+}
+
+case $# in
+	2)
+		moses_srilm_kn $1 $2
+	;;
+	*)
+		echo "usage: moses_srilm_kn <text> <language>" 1>&2
+	;;
+esac

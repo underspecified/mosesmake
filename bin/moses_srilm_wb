@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# 5-gram language model with Witten-Bell discounting
+# use with corpora where sparseness is a problem, such as POS-based LMs
+moses_srilm_wb () {
+	ngram-count -order 5 -interpolate -kndiscount -text $1 -lm $2
+}
+
+case $# in
+	2)
+		moses_srilm_wb $1 $2
+	;;
+	*)
+		echo "usage: moses_srilm_wb <text> <language>" 1>&2
+	;;
+esac
