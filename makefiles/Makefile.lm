@@ -1,9 +1,24 @@
 #!/usr/bin/make
 
 include ../Makefile.vars
-inclue $MHOME/makefiles/Makefile.fact
 
-all:	clean $(corpus).train.pos.$(src) $(corpus).train.tok.$(src) \
-			  $(corpus).train.pos.$(tgt) $(corpus).train.tok.$(tgt)
+all:	$(lm_corpus).surface.lm $(lm_corpus).pos.lm
 
-.PHONY:	all
+nuke:	clean
+	rm -f *.lm
+
+%.surface.lm:	%.tok.$(tgt)
+	moses_srilm_kn $< $@
+	
+%.pos.lm:	%.tok.$(tgt)
+	moses_srilm_wb $< $@
+
+$(lm_corpus).clean.$(tgt):	$(lm_corpus)
+	ln -sf $< $@
+
+$(lm_corpus):	$(lm_file)
+	cp -f $(lm_file) $(lm_corpus)
+
+include $(MHOME)/makefiles/Makefile.fact
+
+.PHONY:	all nuke
