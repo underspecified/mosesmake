@@ -2,14 +2,14 @@
 
 include Makefile.vars
 
-all:	corpus
+all:	corpus lm
 
 %:	$MHOME/makefiles/Makefile.%
 	mkdir -p $*
-	cp $MHOME/makefiles/Makefile.$* $*/Makefile
-	cd $* && make
+	cp -f $MHOME/makefiles/Makefile.$* $*/Makefile
+	make -C $*
 
 nuke:
-	rm -rf corpus
+	rm -rf corpus lm
 
 .PHONY: all clean nuke
