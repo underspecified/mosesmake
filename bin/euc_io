@@ -1,0 +1,10 @@
+#!/bin/bash
+
+euc_io () {
+	cmd=$*
+	utf2euc |
+	exec $cmd |
+	euc2utf
+}
+
+euc_io $*

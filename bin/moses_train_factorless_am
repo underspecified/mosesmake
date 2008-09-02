@@ -1,0 +1,21 @@
+#!/bin/bash
+
+moses_train_factorless_am () {
+	system=$1
+	train_lc=$2
+	src=$3
+	tgt=$4
+	cmd="train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train_lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0"
+	echo $cmd
+	$cmd
+}
+
+case $# in
+	4)
+		moses_train_factorless_am $*
+	;;
+	*)
+		echo "usage: moses_train_factorless_am <system_root> <training_corpus> <src_language> <target_language>" 1>&2
+		exit 1
+	;;
+esac

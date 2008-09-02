@@ -1,0 +1,7 @@
+#!/bin/bash
+
+utf2euc () {
+	iconv -s -c -f utf-8 -t ujis
+}
+
+utf2euc

@@ -1,0 +1,31 @@
+#!/bin/bash
+
+moses_translate () {
+	input=$1
+	ini=$2
+	
+	case "$factors" in
+		surface+lemma+pos|surface+lemma+pos+morph)
+			suf=lc
+		;;
+		*)
+			suf=tok
+		;;
+	esac
+	
+	cmd="moses -config $ini -input-file $input.$suf"
+	echo $cmd 1>&2
+	$cmd
+}
+case $# in
+	2)
+		moses_translate $*
+	;;
+	3)
+		factors=$3 moses_translate $1 $2
+	;;
+	*)
+		echo "usage: moses_translate <input> <moses.ini> <factors>" 1>&2
+		exit 1
+	;;
+esac

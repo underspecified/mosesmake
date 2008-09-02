@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# UTF8 mecab
+mecab8 () {
+	euc_io mecab $*
+}
+
+mecab8 $*

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+moses_detokenize () {
+	detokenizer.perl -l $1
+}
+
+case $# in
+	1)
+		moses_detokenize $*
+	;;
+	*)
+		echo "usage: moses_detokenize <language>" 1>&2
+		exit 1
+	;;
+esac

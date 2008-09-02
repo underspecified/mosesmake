@@ -1,0 +1,27 @@
+#!/bin/bash
+
+moses_mert () {
+	tuning_dir=$1
+	ini=$2
+	input_tok=$3
+	ref_tok=$4
+
+	if [ -s "$tuning_dir/finished_step.txt" ]; then
+		flags="--continue"
+	fi
+	
+	cmd="mert-moses.pl $flags $tuning_dir/$input_tok $tuning_dir/$ref_tok /usr/bin/moses $ini --working-dir $tuning_dir --rootdir /usr/share/moses/scripts"
+	echo $cmd
+	$cmd
+}
+
+case $# in
+	4)
+		moses_mert $*
+	;;
+	*)
+		echo "usage: moses_mert <tuning_directory> <model_moses.ini> <tokenized_input> <tokenized_references>" 1>&2
+		exit 1
+	;;
+esac
+	
