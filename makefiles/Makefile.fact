@@ -14,10 +14,22 @@ clean:
 %.fact.$(tgt):	%.clean.$(tgt)
 	moses_factorize_corpus $(tgt) < $< > $@
 
+$(lm_corpus).fact:	$(lm_corpus)
+	moses_factorize_corpus $(tgt) < $< > $@
+	
+%.input.fact:	%.input
+	moses_factorize_corpus $(src) < $< > $@
+
+%.reference.fact:	%.reference
+	moses_factorize_corpus $(tgt) < $< > $@
+
 %.lc.$(src):	%.fact.$(src)
 	moses_lowercase < $< > $@
 
 %.lc.$(tgt):	%.fact.$(tgt)
+	moses_lowercase < $< > $@
+
+%.lc:	%.fact
 	moses_lowercase < $< > $@
 
 %.tok.$(src):	%.lc.$(src)
@@ -26,11 +38,18 @@ clean:
 %.tok.$(tgt):	%.lc.$(tgt)
 	moses_fact2tok < $< > $@
 
+%.tok:	%.lc
+	moses_fact2tok < $< > $@
+
 %.pos.$(src):	%.lc.$(src)
 	moses_fact2pos < $< > $@	
 
 %.pos.$(tgt):	%.lc.$(tgt)
 	moses_fact2pos < $< > $@	
+
+%.pos:	%.lc
+	moses_fact2pos < $< > $@	
+
 
 .SECONDARY:
 
