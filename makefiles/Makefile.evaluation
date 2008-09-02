@@ -24,11 +24,11 @@ $(corpus).test.reference:	$(test_tgt_file)
 
 %.no_mert.output.sig:	%.no_mert.output.detok %.reference \
 						$(baseline_no_mert)
-	moses_eval_sig $^ $(samples) | tee $@
+	moses_eval_sig -s $(samples) $^ | tee $@
 
 %.mert.output.sig:	%.mert.output.detok %.reference \
 					$(baseline_mert)
-	moses_eval_sig $^ $(samples) | tee $@
+	moses_eval_sig -s $(samples) $^ | tee $@
  
 %.no_mert.output.bleu:	%.reference %.no_mert.output.detok
 	moses_bleu $^ | tee $@

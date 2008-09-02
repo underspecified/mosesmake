@@ -1,9 +1,9 @@
 #!/bin/bash
 	
-moses_eval_significance () {
+moses_eval_sig () {
 	tgt1=$1
 	ref=$2
-	samples=$3
+	tgt2=$3
 	
 	echo '*** BLEU score for document ***'
 	command_doc="doc_bleu.rb $tgt1 $ref"
@@ -30,7 +30,7 @@ moses_eval_significance () {
 #	echo $command_binom
 #	$command_binom
 	
-	if [ -n "$tgt2" ]; then
+	if [ -s "$tgt2" ]; then
 		echo
 		echo '*** Bootstrap testing ***'
 		r3=$RANDOM
@@ -44,20 +44,28 @@ samples=100
 while [ $# -gt 0 -a "${1#-}" != "$1" ]; do
         case $1 in
                 -s|--samples)
-			samples=$1
+			if [ -n "$2" ]; then
+				samples=$2
+			fi
+			shift 2
+		;;
+		*)
+			echo "usage: moses_eval_sig [-s|--samples <samples> ] <target1> <reference> [<target2>]" 1>&2
+			exit 1
 		;;
 	esac
 done
+export $samples
 
 case $# in
 	2)
-		moses_eval_significance $1 $2 $samples
+		moses_eval_sig $*
 	;;
 	3)
-		tgt2=$3 moses_eval_significance $1 $2 $samples
+		moses_eval_sig $*
 	;;
 	*)
-		echo "usage: moses_eval_sig [-s <samples>  ]<target1> <reference> <target2>" 1>&2
-		exit
+		echo "usage: moses_eval_sig [-s|--samples <samples> ] <target1> <reference> [<target2>]" 1>&2
+		exit 1
 	;;
 esac
