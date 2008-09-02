@@ -55,7 +55,6 @@ while [ $# -gt 0 -a "${1#-}" != "$1" ]; do
 		;;
 	esac
 done
-export $samples
 
 case $# in
 	2)
