@@ -6,13 +6,13 @@ all:	$(corpus).train.pos.$(src) $(corpus).train.tok.$(src) \
 		$(corpus).train.pos.$(tgt) $(corpus).train.tok.$(tgt)
 
 nuke:	clean
-	$(corpus).train.$(src) $(corpus).train.$(tgt)
+	rm -f $(corpus).train.$(src) $(corpus).train.$(tgt)
 
 $(corpus).train.$(src):	$(train_src_file)
-	cp -f $(train_src_file) $(corpus).train.$(src)
+	cp -f $< $@
 
 $(corpus).train.$(tgt):	$(train_tgt_file)
-	cp -f $(train_tgt_file) $(corpus).train.$(tgt)
+	cp -f $< $@
 
 include $(MHOME)/makefiles/Makefile.fact
 
