@@ -28,7 +28,7 @@ $(corpus).test.reference:	$(test_tgt_file)
 
 %.mert.output.sig:	%.mert.output.detok %.reference \
 					$(baseline_mert)
-	moses_eval_sig $^ | tee $@
+	moses_eval_sig $^ $(samples) | tee $@
  
 %.no_mert.output.bleu:	%.reference %.no_mert.output.detok
 	moses_bleu $^ | tee $@
@@ -36,10 +36,10 @@ $(corpus).test.reference:	$(test_tgt_file)
 %.mert.output.bleu:	%.reference %.mert.output.detok
 	moses_bleu $^ | tee $@
 
-%.no_mert.output:	%.input.tok filtered.no_mert/moses.ini
+%.no_mert.output.fact:	%.input.tok filtered.no_mert/moses.ini
 	moses_translate $*.input filtered.no_mert/moses.ini $(factors) > $@
 
-%.mert.output:	%.input.tok filtered.mert/moses.ini
+%.mert.output.fact:	%.input.tok filtered.mert/moses.ini
 	moses_translate $*.input filtered.mert/moses.ini $(factors) > $@
 
 %.detok:	%.rc
@@ -48,11 +48,11 @@ $(corpus).test.reference:	$(test_tgt_file)
 %.rc:	$(recaser_dir)/moses.ini %
 	moses_recase $^ > $@
 
-%:	%.fact
+%.output:	%.output.fact
 	moses_fact2tok < $< > $@
 
 $(recaser_dir)/moses.ini:
-	make -C .. $*
+	make -C .. $@
 
 ../%:
 	make -C .. $*
