@@ -1,6 +1,6 @@
 #!/bin/bash
 
-moses_train_factorless_am () {
+moses_train_am () {
 	system=$1
 	train_lc=$2
 	src=$3
@@ -38,10 +38,10 @@ moses_train_factorless_am () {
 
 case $# in
 	7)
-		moses_train_factorless_am $*
+		moses_train_am $*
 	;;
 	*)
-		echo "usage: moses_train_factorless_am <system_root> <training_corpus> <src_language> <target_language> <surface_lm> <pos_lm> <factors>" 1>&2
+		echo "usage: moses_train_am <system_root> <training_corpus> <src_language> <target_language> <surface_lm> <pos_lm> <factors>" 1>&2
 		exit 1
 	;;
 esac
