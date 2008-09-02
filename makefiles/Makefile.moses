@@ -2,7 +2,7 @@
 
 include Makefile.vars
 
-all:	corpus lm model model tuning evaluation	
+all:	corpus lm model recaser tuning evaluation	
 
 nuke:
 	rm -rf corpus evaluation giza.* lm model tuning
