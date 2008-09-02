@@ -24,16 +24,17 @@ moses_factorize_corpus_ja () {
 }
 
 protect_char () {
-	sed 's/$1/*CHAR*/g'
+	sed 's/$1/*$2*/g'
 }
 
 restore_char () {
-	sed 's/*CHAR*/$1/g'
+	sed 's/*$1*/$2/g'
 }
 
 moses_fact2tok_pos () {
 	moses_fact2tok+pos |
-	protect_char '|' |
+#	protect_char '|' 'PIPE' |
+	protect_char '_' 'UNDERSCORE' |
 	tr '|' '_'
 }
 
@@ -50,7 +51,8 @@ moses_tok_pos2morph () {
 		}
 		print
 	}' |
-	restore_char '|'
+#	restore_char 'PIPE' '|'
+	restore_char 'UNDERSCORE' '_'
 }
 
 moses_add_morph_en () {
