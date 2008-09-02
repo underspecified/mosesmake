@@ -7,17 +7,14 @@ all:	$(lm_corpus).surface.lm $(lm_corpus).pos.lm
 nuke:	clean
 	rm -f *.lm
 
-%.surface.lm:	%.tok.$(tgt)
+%.surface.lm:	%.tok
 	moses_srilm_kn $< $@
 	
-%.pos.lm:	%.tok.$(tgt)
+%.pos.lm:	%.tok
 	moses_srilm_wb $< $@
 
-$(lm_corpus).clean.$(tgt):	$(lm_corpus)
-	ln -sf $< $@
-
 $(lm_corpus):	$(lm_file)
-	cp -f $(lm_file) $(lm_corpus)
+	cp -f $< $@
 
 include $(MHOME)/makefiles/Makefile.fact
 
