@@ -1,0 +1,18 @@
+all:	moses.ini
+
+nuke:
+	rm -f $(recaser_corpus).* cased.srilm.gz moses.ini phrase-table.0-0.gz
+
+moses.ini:	$(recaser_corpus).tok
+	train-recaser.perl -train-script /usr/bin/train-factored-phrase-model.perl -ngram-count /usr/bin/ngram-count -corpus $< -dir `pwd`
+
+$(recaser_corpus):	$(recaser_file)
+	cp -f $< $@
+
+%.tok:	%.fact
+	moses_fact2tok < $< > $@
+
+%.fact:	%
+	moses_factorize_corpus $(lang) < $< > $@
+
+.PHONY:	all nuke

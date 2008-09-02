@@ -1,0 +1,27 @@
+#!/usr/bin/make
+
+include ../Makefile.vars
+
+all:	moses.weight-reused.ini
+
+nuke:	clean
+
+moses.weight-reused.ini:	../model/moses.ini moses.ini
+	reuse-weights.perl moses.ini < ../model/moses.ini > $@
+
+moses.ini:	../model/moses.ini \
+			$(corpus).dev.input.tok $(corpus).dev.reference.tok
+	moses_mert `pwd` $^
+
+$(corpus).dev.input:	$(dev_src_file)
+	cp -f $< $@
+
+$(corpus).dev.reference:	$(dev_tgt_file)
+	cp -f $< $@
+
+../%:
+	make -C .. $*
+
+include $(MHOME)/makefiles/Makefile.fact
+
+.PHONY:	all nuke

@@ -1,0 +1,62 @@
+#!/usr/bin/make
+
+include ../Makefile.vars
+
+all:	$(corpus).test.mert.output.bleu \
+		$(corpus).test.mert.output.sig
+
+nuke:	clean
+	rm -rf filtered.* *.bleu *.sig *.detok *.rc
+
+filtered.mert/moses.ini:	../tuning/moses.weight-reused.ini \
+							$(corpus).test.input.lc
+	filter-model-given-input.pl filtered.mert $^
+
+filtered.no_mert/moses.ini:	../model/moses.ini \
+							$(corpus).test.input.lc
+	filter-model-given-input.pl filtered.no_mert $^
+
+$(corpus).test.input:	$(test_src_file)
+	cp -f $< $@
+
+$(corpus).test.reference:	$(test_tgt_file)
+	cp -f $< $@
+
+%.no_mert.output.sig:	%.no_mert.output.detok %.reference \
+						$(baseline_no_mert)
+	moses_eval_sig $^ $(samples) | tee $@
+
+%.mert.output.sig:	%.mert.output.detok %.reference \
+					$(baseline_mert)
+	moses_eval_sig $^ | tee $@
+ 
+%.no_mert.output.bleu:	%.reference %.no_mert.output.detok
+	moses_bleu $^ | tee $@
+
+%.mert.output.bleu:	%.reference %.mert.output.detok
+	moses_bleu $^ | tee $@
+
+%.no_mert.output:	%.input.tok filtered.no_mert/moses.ini
+	moses_translate $*.input filtered.no_mert/moses.ini $(factors) > $@
+
+%.mert.output:	%.input.tok filtered.mert/moses.ini
+	moses_translate $*.input filtered.mert/moses.ini $(factors) > $@
+
+%.detok:	%.rc
+	moses_detokenize $(tgt) < $< > $@
+
+%.rc:	$(recaser_dir)/moses.ini %
+	moses_recase $^ > $@
+
+%:	%.fact
+	moses_fact2tok < $< > $@
+
+$(recaser_dir)/moses.ini:
+	make -C .. $*
+
+../%:
+	make -C .. $*
+
+include $(MHOME)/makefiles/Makefile.fact
+
+.PHONY:	all nuke
