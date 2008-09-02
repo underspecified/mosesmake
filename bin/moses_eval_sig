@@ -2,8 +2,8 @@
 	
 moses_eval_significance () {
 	tgt1=$1
-	tgt2=$2
-	ref=$3
+	ref=$2
+	samples=$3
 	
 	echo '*** BLEU score for document ***'
 	command_doc="doc_bleu.rb $tgt1 $ref"
@@ -19,23 +19,45 @@ moses_eval_significance () {
 	echo
 	echo '*** Confidence Interval ***'
 	r1=$RANDOM
-	command_confiv="confiv.rb $r1 1000 95 $tgt1 $ref"
+	command_confiv="confiv.rb $r1 $samples 95 $tgt1 $ref"
 	echo $command_confiv
 	$command_confiv
 	
 #	echo
 #	echo '*** Binomial testing ***'
 #	r2=$RANDOM
-#	command_binom="binom.rb $r2 5 100 $tgt1 $tgt2 $ref"
+#	command_binom="binom.rb $r2 5 $samples $tgt1 $tgt2 $ref"
 #	echo $command_binom
 #	$command_binom
 	
-	echo
-	echo '*** Bootstrap testing ***'
-	r3=$RANDOM
-	command_bootstrap="bootstrap.rb $r3 1000 $tgt1 $tgt2 $ref"
-	echo $command_bootstrap
-	$command_bootstrap
+	if [ -n "$tgt2" ]; then
+		echo
+		echo '*** Bootstrap testing ***'
+		r3=$RANDOM
+		command_bootstrap="bootstrap.rb $r3 $samples $tgt1 $tgt2 $ref"
+		echo $command_bootstrap
+		$command_bootstrap
+	fi
 }
 
-moses_eval_significance $*
+samples=100
+while [ $# -gt 0 -a "${1#-}" != "$1" ]; do
+        case $1 in
+                -s|--samples)
+			samples=$1
+		;;
+	esac
+done
+
+case $# in
+	2)
+		moses_eval_significance $1 $2 $samples
+	;;
+	3)
+		tgt2=$3 moses_eval_significance $1 $2 $samples
+	;;
+	*)
+		echo "usage: moses_eval_sig [-s <samples>  ]<target1> <reference> <target2>" 1>&2
+		exit
+	;;
+esac
