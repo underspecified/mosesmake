@@ -6,7 +6,7 @@ all:	$(corpus).test.mert.output.bleu \
 		$(corpus).test.mert.output.sig
 
 nuke:	clean
-	rm -rf filtered.* *.bleu *.sig *.detok *.rc
+	rm -rf filtered.* *.bleu *.detok *.rc *.output* *.sig
 
 filtered.mert/moses.ini:	../tuning/moses.weight-reused.ini \
 							$(corpus).test.input.lc
