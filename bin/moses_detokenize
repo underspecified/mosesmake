@@ -1,7 +1,14 @@
 #!/bin/bash
 
 moses_detokenize () {
-	detokenizer.perl -l $1
+	case "$1" in
+		en|fr|cs)
+			detokenizer.perl -l $1
+		;;
+		*)
+			detokenizer.perl
+		;;
+	esac
 }
 
 case $# in
