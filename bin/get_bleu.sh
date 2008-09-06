@@ -45,7 +45,7 @@ print_range () {
 			FS = "<="
 		}
 		/SYSTEM BLEU/ {
-			printf "+/- %2.2f\n", 100*($3-$1)/2
+			print 100*($3-$1)/2
 		}'
 	fi
 }
@@ -69,15 +69,19 @@ print_sig () {
 	fi
 }
 
-format_data () {
+get_data () {
 	paste <(echo $1 | get_lang+fact) \
 		  <(basename $1 | get_corpus+para+mert) \
 		  <(print_bleu < $1) \
 		  <(print_range $1) \
-		  <(print_sig $1) |
+		  <(print_sig $1)
+}
+
+format_data () {
 	awk '
 	BEGIN {
 		FS = OFS = "\t"
+		delta = "--"
 	}
 	{
 		lang = $1
@@ -88,15 +92,61 @@ format_data () {
 		bleu = $6
 		range = $7
 		sig = $8
-		print lang, corpus, fact, mert, para, bleu, range, sig
+
+		snum = split(sig, s, "/")
+		if (snum == 3) {
+			w = s[1]
+			l = s[2]
+			d = s[3]
+			sig = 100 * w / (w + l + d)
+			sig = sprintf("%4.1f%", sig)
+		}
+		else {
+			sig = sprintf("%5s", "--")
+		}
+
+                if ((lang != plang) || (corpus != pcorpus) || (fact != pfact)) {
+                        base = ""
+                }
+
+                plang = lang
+                pcorpus = corpus
+                pfact = fact
+
+                if (para == 0) {
+                        base = bleu
+                }
+
+		if (base) {
+			delta = bleu - base
+			if (delta == 0) {
+				delta = "--"
+			}
+			else if (delta > 0) {
+				delta = sprintf("+%.2f%", (100 * delta / base))
+			}
+			else {
+				delta = sprintf("%.2f%", (100 * delta / base))
+			}
+		}
+		delta = sprintf("%6s", delta)
+
+		if (range) {
+#			range = sprintf("+/-%5.2f%%", (100 * range / bleu))
+			range = sprintf("+/-%.2f", range)
+		}
+		
+		print lang, corpus, fact, para, bleu, range, delta, sig
 	}'
 }
 
 get_bleu () {
 	for f in `find_bleu $*`; do
-		format_data $f
+		get_data $f
 	done
 } 
 
 get_bleu $* |
+sort |
+format_data |
 sort
