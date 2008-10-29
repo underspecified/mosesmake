@@ -36,17 +36,27 @@ print_bleu () {
 	tr -d ,
 }
 
+print_meteor () {
+        meteor=`echo $1 | sed 's/.bleu$/.meteor/'`
+        if [[ -s "$meteor" ]]; then
+                awk '
+                /Score:/ {
+                        print 100 * $2
+                }' < $meteor
+        fi
+}
+
+
 print_range () {
 	sig=`echo $1 | sed 's/.bleu$/.sig/'`
 	if [[ -s "$sig" ]]; then
-		cat $sig |
 		awk '
 		BEGIN {
 			FS = "<="
 		}
 		/SYSTEM BLEU/ {
 			print 100*($3-$1)/2
-		}'
+		}' < $sig
 	fi
 }
 
@@ -74,14 +84,14 @@ get_data () {
 		  <(basename $1 | get_corpus+para+mert) \
 		  <(print_bleu < $1) \
 		  <(print_range $1) \
-		  <(print_sig $1)
+		  <(print_sig $1) \
+		  <(print_meteor $1)
 }
 
 format_data () {
 	awk '
 	BEGIN {
 		FS = OFS = "\t"
-		delta = "--"
 	}
 	{
 		lang = $1
@@ -92,51 +102,69 @@ format_data () {
 		bleu = $6
 		range = $7
 		sig = $8
+		meteor = $9
+
+		fact = sprintf("%-10s", fact)
+
+                if (range) {
+#                       range = sprintf("+/-%.2f%%", (100 * range / bleu))
+                        range = sprintf("+/-%.2f", range)
+                }
+                else {
+                        range = "--"
+                }
+                range = sprintf("%6s", range)
+
+		bleu = sprintf("%5.2f", bleu)
 
 		snum = split(sig, s, "/")
 		if (snum == 3) {
-			w = s[1]
-			l = s[2]
-			d = s[3]
+			w = s[1]; l = s[2]; d = s[3]
 			sig = 100 * w / (w + l + d)
 			sig = sprintf("%4.1f%", sig)
 		}
 		else {
-			sig = sprintf("%5s", "--")
+			sig = "--"
 		}
+		sig = sprintf("%6s", sig)
 
                 if ((lang != plang) || (corpus != pcorpus) || (fact != pfact)) {
                         base = ""
                 }
-
                 plang = lang
                 pcorpus = corpus
                 pfact = fact
 
+                if (meteor > 0) {
+                        meteor = sprintf("%5.2f", meteor)
+                }
+                else {
+                        meteor = "--"
+                }
+                meteor = sprintf("%6s", meteor)
+
                 if (para == 0) {
                         base = bleu
                 }
-
+		
+		delta = "--"
 		if (base) {
 			delta = bleu - base
 			if (delta == 0) {
 				delta = "--"
 			}
 			else if (delta > 0) {
-				delta = sprintf("+%.2f%", (100 * delta / base))
+				delta = sprintf("+%.2f", delta)
 			}
 			else {
-				delta = sprintf("%.2f%", (100 * delta / base))
+				delta = sprintf("%.2f", delta)
 			}
+#                       delta = 100 * delta / base
+#			delta = sprint("%s%", delta)
 		}
-		delta = sprintf("%6s", delta)
+		delta = sprintf("%9s", delta)
 
-		if (range) {
-#			range = sprintf("+/-%5.2f%%", (100 * range / bleu))
-			range = sprintf("+/-%.2f", range)
-		}
-		
-		print lang, corpus, fact, para, bleu, range, delta, sig
+		print lang, corpus, fact, para, bleu, range, delta, sig, meteor
 	}'
 }
 

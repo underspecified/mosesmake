@@ -4,23 +4,26 @@ header () {
 	cat <<- HEADER
 		\documentclass{article}
 		\begin{document}
-		\begin{tabular}{lllrrrr}
+		\begin{tabular}{lllrrrrr}
 
-		Factors & Corpus & Paraphrases & Bleu & Variance & Delta & Significance \\\\ \hline
+		%Lang & Factors & Corpus & Paraphrases & Bleu & Variance & Delta & Significance & Meteor \\\\ \hline
 	HEADER
 }
 
 body () {
-	grep -v pos |
-	cut -f1,2,4- |
-	sed 's#ja-en#JE#g
-	     s#en-ja#EJ#g
-	     s#--#\\--#g
-	     s#w_mert#mert#g
-	     s#+/-#$\\pm$#g
-	     s#%#\\%#g
-	     s#\t# \& #g
-	     s#$# \\\\#g'
+#	grep -v pos |
+#	cut -f1,2,4- |
+	sed    's#ja-en#JE#g
+		s#en-ja#EJ#g
+		s#slt#IWSLT05#g
+		s#tc[0-9]*s#Half Tanaka Corpus#g
+		s#tc[0-9]*#Full Tanaka Corpus#g
+		s#--#\\--#g
+		s#w_mert#mert#g
+		s#+/-#$\\pm$#g
+		s#%#\\%#g
+		s#\t# \& #g
+		s#$# \\\\#g'
 }
 
 footer () {

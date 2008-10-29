@@ -3,7 +3,11 @@
 include ../Makefile.vars
 
 all:	$(corpus).test.mert.output.bleu \
-		$(corpus).test.mert.output.sig
+	$(corpus).test.mert.output.meteor \
+	$(corpus).test.mert.output.sig \
+	$(corpus).test.no_mert.output.bleu \
+	$(corpus).test.no_mert.output.meteor \
+	$(corpus).test.no_mert.output.sig
 
 nuke:	clean
 	rm -rf filtered.* *.bleu *.detok *.rc *.output* *.sig
@@ -22,6 +26,12 @@ $(corpus).test.input:	$(test_src_file)
 $(corpus).test.reference:	$(test_tgt_file)
 	cp -f $< $@
 
+%.no_mert.output.meteor:   %.no_mert.output.detok %.reference
+	moses_meteor $^ | tee $@
+
+%.mert.output.meteor:   %.mert.output.detok %.reference
+	moses_meteor $^ | tee $@
+
 %.no_mert.output.sig:	%.no_mert.output.detok %.reference \
 						$(baseline_no_mert)
 	moses_eval_sig -s $(samples) $^ | tee $@
@@ -36,11 +46,11 @@ $(corpus).test.reference:	$(test_tgt_file)
 %.mert.output.bleu:	%.reference %.mert.output.detok
 	moses_bleu $^ | tee $@
 
-%.no_mert.output.fact:	%.input.tok filtered.no_mert/moses.ini
-	moses_translate $*.input filtered.no_mert/moses.ini $(factors) > $@
+$(corpus).test.no_mert.output.fact:	$(corpus).test.input.tok filtered.no_mert/moses.ini
+	moses_translate $(corpus).test.input filtered.no_mert/moses.ini $(factors) > $@
 
-%.mert.output.fact:	%.input.tok filtered.mert/moses.ini
-	moses_translate $*.input filtered.mert/moses.ini $(factors) > $@
+$(corpus).test.mert.output.fact:	$(corpus).test.input.tok filtered.mert/moses.ini
+	moses_translate $(corpus).test.input filtered.mert/moses.ini $(factors) > $@
 
 %.detok:	%.rc
 	moses_detokenize $(tgt) < $< > $@
