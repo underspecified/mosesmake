@@ -81,7 +81,9 @@ moses_add_morph_en () {
 }
 
 moses_factorize_corpus_en () {
+	iconv -c -f utf-8 -t iso-8859-15 |
 	tag_with_eos tree-tagger-english 2>/dev/null |
+	iconv -c -f iso-8859-15 -t utf-8 |
 	awk '
 	BEGIN {
 		FS = "\t"
@@ -100,11 +102,60 @@ moses_factorize_corpus_en () {
 	moses_add_morph_en
 }
 
+moses_factorize_corpus_it () {
+	iconv -c -f utf-8 -t iso-8859-15 |
+	tag_with_eos tree-tagger-italian 2>/dev/null |
+	iconv -c -f iso-8859-15 -t utf-8 |
+	awk '
+	BEGIN {
+		FS = "\t"
+		OFS = "|"
+	}
+	NF >= 3 {
+		surface = $1
+		pos = $2
+#		morph = $2
+		lemma = $3
+#		print surface, lemma, pos, morph
+		print surface, lemma, pos
+	}
+	/^EOS$/' |
+	eos_record2line
+}
+
+moses_factorize_corpus_es () {
+	iconv -c -f utf-8 -t iso-8859-15 |
+	tag_with_eos tree-tagger-spanish 2>/dev/null |
+	iconv -c -f iso-8859-15 -t utf-8 |
+	awk '
+	BEGIN {
+		FS = "\t"
+		OFS = "|"
+	}
+	NF >= 3 {
+		surface = $1
+		pos = $2
+#		morph = $2
+		lemma = $3
+#		print surface, lemma, pos, morph
+		print surface, lemma, pos
+	}
+	/^EOS$/' |
+	eos_record2line
+}
+
+
 moses_factorize_corpus () {
 	lang=$1
 	case $lang in
 		en)
 			moses_factorize_corpus_en
+		;;
+		es)
+			moses_factorize_corpus_es
+		;;
+		it)
+			moses_factorize_corpus_it
 		;;
 		ja)
 			moses_factorize_corpus_ja
