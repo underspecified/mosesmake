@@ -2,7 +2,7 @@
 
 # UTF8 mecab
 mecab8 () {
-	euc_io mecab $*
+	mecab -d $MECAB_DIC $*
 }
 
 mecab8 $*
