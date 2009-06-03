@@ -4,7 +4,7 @@
 ## Assumes MHOME is pointing to this directory.
 ## Add the following to your .bashrc (or .zshrc):
 
-## export MHOME=/path/to/mosestools
+## export MHOME=/path/to/mosesmake
 ## if [ -f $MHOME/setup.sh ]; then
 ## 	. $MHOME/setup.sh
 ## fi
