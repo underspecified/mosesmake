@@ -1,7 +1,9 @@
 #!/bin/bash
 
 moses_meteor () {
-    meteor.pl -s my_system -t <(wrap-xml.perl $1 src) -r <(wrap-xml.pl $2 tgt) --modules wn_stem,wn_synonmy
+    test2sgm.awk < $1 > $1.sgm
+    ref2sgm.awk < $2 > $2.sgm
+    meteor.pl -s my_system -t $1.sgm -r $2.sgm --modules wn_stem,wn_synonmy
 }
 
 moses_meteor $*

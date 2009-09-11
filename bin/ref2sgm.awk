@@ -6,7 +6,7 @@ BEGIN {
 }
 {
     print "<hl>"
-    print "    <seg id=" NF ">" $0 "</seg>"
+    print "    <seg id=" NR ">" $0 "</seg>"
     print "</h1>"
 }
 END {
