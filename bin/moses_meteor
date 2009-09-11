@@ -1,9 +1,7 @@
 #!/bin/bash
 
 moses_meteor () {
-    test2sgm.awk < $1 > $1.sgm
-    ref2sgm.awk < $2 > $2.sgm
-    meteor.pl -s my_system -t $1.sgm -r $2.sgm --modules wn_stem,wn_synonmy
+    meteor.pl -s sys -t <(test2sgm.awk < $1) -r <(ref2sgm.awk < $2) --modules wn_stem
 }
 
 moses_meteor $*
