@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+moses_meteor () {
+    meteor.pl -s my_system -t <(wrap-xml.perl $1 src) -r <(wrap-xml.pl $2 tgt) --modules wn_stem,wn_synonmy
+}
+
+moses_meteor $*
