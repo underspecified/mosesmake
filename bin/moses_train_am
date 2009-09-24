@@ -2,7 +2,7 @@
 
 moses_train_am () {
 	system=$1
-	train_lc=$2
+	train=$2
 	src=$3
 	tgt=$4
 	surface_lm=$6
@@ -11,19 +11,19 @@ moses_train_am () {
 	
 	case $factors in
 		factorless)
-			cmd="train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train_lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0"
+			cmd="train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.tok -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0"
 		;;
 		pos)
-			cmd="train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train_lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 0-0,2"
+			cmd="train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 0-0,2"
 		;;
 		pos-gen)
-			cmd="train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train_lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 0-0 --generation-factors 0-2 --decoding-steps t0,g0"
+			cmd="train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 0-0 --generation-factors 0-2 --decoding-steps t0,g0"
 		;;
 		lemma+pos+morph)
-			cmd="train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train_lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 1-1+2,3-2 --generation-factors 1-2+1,2-0 --decoding-steps t0,g0,t1,g1"
+			cmd="train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 1-1+2,3-2 --generation-factors 1-2+1,2-0 --decoding-steps t0,g0,t1,g1"
 		;;
 		surface+lemma+pos+morph)
-			cmd="train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train_lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 1-1+3-2+0-0,2 --generation-factors 1-2+1,2-0 --decoding-steps t0,g0,t1,g1:t2"
+			cmd="train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 1-1+3-2+0-0,2 --generation-factors 1-2+1,2-0 --decoding-steps t0,g0,t1,g1:t2"
 		;;
 		*)
 			echo "unknown factors: $factors" 1>&2
