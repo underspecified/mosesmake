@@ -16,7 +16,7 @@ clean:
 
 $(lm_corpus).fact:	$(lm_corpus)
 	moses_factorize_corpus $(tgt) < $< > $@
-	
+
 %.input.fact:	%.input
 	moses_factorize_corpus $(src) < $< > $@
 
@@ -40,6 +40,15 @@ $(lm_corpus).fact:	$(lm_corpus)
 
 %.tok:	%.lc
 	moses_fact2tok < $< > $@
+
+%.lemma.$(src):	%.lc.$(src)
+	moses_fact2lemma < $< > $@
+
+%.lemma.$(tgt):	%.lc.$(tgt)
+	moses_fact2lemma < $< > $@
+
+%.lemma:	%.lc
+	moses_fact2lemma < $< > $@
 
 %.pos.$(src):	%.lc.$(src)
 	moses_fact2pos < $< > $@	
