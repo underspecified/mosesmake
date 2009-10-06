@@ -1,0 +1,20 @@
+#!/bin/bash
+
+moses_fact2tok () {
+	awk '
+	BEGIN {
+		ORS = ""
+	}
+	{
+		surface = 1
+		lemma = 2
+		pos = 3
+		for (i=1; i<=NF; i++) {
+			split($i, data, "|")
+			printf "%s ", data[lemma]
+		}
+		print "\n"
+	}'
+}
+
+moses_fact2tok
