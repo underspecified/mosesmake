@@ -39,10 +39,10 @@ $(recaser_dir)/%:	$(recaser_dir)/Makefile
 
 model:	model/moses.ini
 
-model/moses.ini:	corpus/$(corpus).train.lc.$(src) corpus/$(corpus).train.lc.$(tgt) \
-					lm/$(lm_corpus).surface.lm lm/$(lm_corpus).pos.lm
+model/moses.ini:	corpus/$(corpus).train.tok.$(src) corpus/$(corpus).train.tok.$(tgt) \
+			lm/$(lm_corpus).surface.lm lm/$(lm_corpus).pos.lm
 	mkdir -p model
-	moses_train_am `pwd` corpus/$(corpus).train.lc $(src) $(tgt) `pwd`/lm/$(lm_corpus).surface.lm `pwd`/lm/$(lm_corpus).pos.lm $(factors)
+	moses_train_am `pwd` corpus/$(corpus).train $(src) $(tgt) `pwd`/lm/$(lm_corpus).surface.lm `pwd`/lm/$(lm_corpus).pos.lm $(factors)
 
 lm:	lm/all
 

@@ -9,9 +9,8 @@
 ## 	. $MHOME/setup.sh
 ## fi
 
-MHOME=`dirname $0`
-PATH=$MHOME/bin:$PATH
-export MHOME PATH
+
+export PATH=$MHOME/bin:$PATH
 
 if [ `uname` = Darwin ]; then
 	. $MHOME/env/Darwin.env
