@@ -1,0 +1,9 @@
+#!/bin/bash
+
+juman8 () {
+	iconv -c -s -f UTF-8 -t UJIS |
+	juman $* |
+	iconv -c -s -f UJIS -t UTF-8
+}
+
+juman8 $*
