@@ -15,12 +15,62 @@ eos_record2line () {
 	head -n -1
 }
 
-moses_factorize_corpus_ja () {
+moses_factorize_corpus_mecab () {
 	tr -d ' ' |
 	mecab8 -F'%m|%f[6]|%F-[0,1]|%F-[4,5]___' |
 	sed 's/___/ /g
 		 s/| /|NULL /g
 		 s/EOS$//g'
+}
+
+moses_factorize_corpus_juman () {
+	tr -d ' ' |
+	juman8 | 
+        grep -v '^@' |
+        awk '
+        BEGIN {
+                RS = "EOS\n"
+                ORS = "\n"
+                FS = "\n"
+                OFS = " "
+        }
+        {
+                for(i=1;i<=NF;i++){
+                        split($i,x," ")
+                        surface = x[1]
+                        yomi = x[2]
+                        lemma = x[3]
+                        pos1 = x[4]
+                        pos2 = x[6]
+                        inftype = x[8]
+                        infform = x[10]
+                        daihyou = x[12]
+
+			pos = pos1
+			if(infform == "*"){
+				morph = "NULL"
+			}
+			else{
+				morph = infform
+			}
+			if($i != ""){
+				printf "%s|%s|%s|%s ", surface, lemma, pos, morph
+                	}
+		}
+                print ""
+        }' |
+	sed 's/ *$//g'
+}
+
+moses_factorize_corpus_ja () {
+	case $TAGGER_JA in
+		juman|mecab)
+			moses_factorize_corpus_${TAGGER_JA}
+		;;
+		*)
+			moses_factorize_corpus_mecab
+		;;
+	esac
 }
 
 protect_char () {
@@ -92,9 +142,7 @@ moses_factorize_corpus_en () {
 	NF >= 3 {
 		surface = $1
 		pos = $2
-#		morph = $2
 		lemma = $3
-#		print surface, lemma, pos, morph
 		print surface, lemma, pos
 	}
 	/^EOS$/' |
@@ -114,9 +162,7 @@ moses_factorize_corpus_it () {
 	NF >= 3 {
 		surface = $1
 		pos = $2
-#		morph = $2
 		lemma = $3
-#		print surface, lemma, pos, morph
 		print surface, lemma, pos
 	}
 	/^EOS$/' |
@@ -135,9 +181,7 @@ moses_factorize_corpus_es () {
 	NF >= 3 {
 		surface = $1
 		pos = $2
-#		morph = $2
 		lemma = $3
-#		print surface, lemma, pos, morph
 		print surface, lemma, pos
 	}
 	/^EOS$/' |
