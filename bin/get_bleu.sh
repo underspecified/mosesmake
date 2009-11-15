@@ -1,7 +1,7 @@
 #!/bin/bash
 
 find_bleu () {
-	find -L $* -name "*.bleu"
+	find -L $* -name "*.mert.output.bleu"
 }
 
 get_lang+fact () {
@@ -11,7 +11,9 @@ get_lang+fact () {
 		OFS = "\t"
 	}
 	{
-		print$(NF-3), $(NF-2)
+		lang = $(NF-3)
+		fact = $(NF-2)
+		print lang, fact
 	}'
 }
 
@@ -22,10 +24,14 @@ get_corpus+para+mert () {
 		OFS = "\t"
 	}
 	{
-		print $1, $2, $(NF-1)
-	}' |
-	sed 's/output/w_mert/g
-		 s/test/0/g'
+		cn = split($1, c, "-")
+		corpus = c[1]
+		dist = c[2]
+		num = $2
+		para = sprintf("%s.%s", dist, num)
+		mert = $4
+		print corpus, para, mert
+	}'
 }
 
 print_bleu () {
@@ -128,24 +134,24 @@ format_data () {
 		}
 		sig = sprintf("%6s", sig)
 
-                if ((lang != plang) || (corpus != pcorpus) || (fact != pfact)) {
-                        base = ""
-                }
-                plang = lang
-                pcorpus = corpus
-                pfact = fact
+        if ((lang != plang) || (corpus != pcorpus) || (fact != pfact)) {
+        	base = ""
+        }
+        plang = lang
+        pcorpus = corpus
+        pfact = fact
 
-                if (meteor > 0) {
-                        meteor = sprintf("%5.2f", meteor)
-                }
-                else {
-                        meteor = "--"
-                }
-                meteor = sprintf("%6s", meteor)
+        if (meteor > 0) {
+        	meteor = sprintf("%5.2f", meteor)
+        }
+        else {
+        	meteor = "--"
+        }
+        meteor = sprintf("%6s", meteor)
 
-                if (para == 0) {
-                        base = bleu
-                }
+        if (para ~ /.0$/) {
+        	base = bleu
+        }
 		
 		delta = "--"
 		if (base) {

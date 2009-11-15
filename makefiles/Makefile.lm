@@ -10,7 +10,7 @@ nuke:	clean
 %.surface.lm:	%.tok
 	moses_srilm_kn $< $@
 	
-%.pos.lm:	%.tok
+%.pos.lm:	%.pos
 	moses_srilm_wb $< $@
 
 $(lm_corpus):	$(lm_file)

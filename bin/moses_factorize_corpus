@@ -63,7 +63,7 @@ moses_factorize_corpus_juman () {
 }
 
 moses_factorize_corpus_ja () {
-	case $TAGGER_JA in
+	case "$TAGGER_JA" in
 		juman|mecab)
 			moses_factorize_corpus_${TAGGER_JA}
 		;;

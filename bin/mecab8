@@ -2,7 +2,9 @@
 
 # UTF8 mecab
 mecab8 () {
-	mecab -d $MECAB_DIC $*
+	iconv -c -s -f UTF-8 -t UJIS |
+	mecab $* |
+	iconv -c -s -f UJIS -t UTF-8
 }
 
 mecab8 $*

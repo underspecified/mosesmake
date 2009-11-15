@@ -14,7 +14,7 @@ moses_fact2tok () {
 			printf "%s ", data[surface]
 		}
 		print "\n"
-	}'
+	}' #| sed -r 's/ ([0-9]+) \./ \1./g'
 }
 
 moses_fact2tok
