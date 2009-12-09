@@ -4,20 +4,29 @@ find_bleu () {
 	find -L $* -name "*.mert.output.bleu"
 }
 
-get_lang+fact () {
+get_corpus+size+lang+fact+para () {
 	awk '
 	BEGIN {
 		FS = "/"
 		OFS = "\t"
 	}
 	{
+		cn = split($(NF-5), c, "-")
+		para = $(NF-4)
 		lang = $(NF-3)
 		fact = $(NF-2)
-		print lang, fact
+		name = c[1]
+		ver = c[2]
+		size = c[3]
+		if (size == "") {
+			size = "147k"
+		}
+		corpus = sprintf("%s-%s", name, ver)
+		print corpus, size, lang, fact, para
 	}'
 }
 
-get_corpus+para+mert () {
+get_mert () {
 	awk '
 	BEGIN {
 		FS = "."
@@ -30,7 +39,7 @@ get_corpus+para+mert () {
 		num = $2
 		para = sprintf("%s.%s", dist, num)
 		mert = $4
-		print corpus, para, mert
+		print mert
 	}'
 }
 
@@ -46,8 +55,8 @@ print_meteor () {
         meteor=`echo $1 | sed 's/.bleu$/.meteor/'`
         if [[ -s "$meteor" ]]; then
                 awk '
-                /Score:/ {
-                        print 100 * $2
+                /Final score:/ {
+                        print 100 * $3
                 }' < $meteor
         fi
 }
@@ -86,8 +95,8 @@ print_sig () {
 }
 
 get_data () {
-	paste <(echo $1 | get_lang+fact) \
-		  <(basename $1 | get_corpus+para+mert) \
+	paste <(echo $1 | get_corpus+size+lang+fact+para) \
+		  <(basename $1 | get_mert) \
 		  <(print_bleu < $1) \
 		  <(print_range $1) \
 		  <(print_sig $1) \
@@ -100,15 +109,16 @@ format_data () {
 		FS = OFS = "\t"
 	}
 	{
-		lang = $1
-		fact = $2
-		corpus = $3
-		para = $4
-		mert = $5
-		bleu = $6
-		range = $7
-		sig = $8
-		meteor = $9
+		corpus = $1
+		size = $2
+		lang = $3
+		fact = $4
+		para = $5
+		mert = $6
+		bleu = $7
+		range = $8
+		sig = $9
+		meteor = $10
 
 		fact = sprintf("%-10s", fact)
 
@@ -134,11 +144,16 @@ format_data () {
 		}
 		sig = sprintf("%6s", sig)
 
-        if ((lang != plang) || (corpus != pcorpus) || (fact != pfact)) {
+#	printf "%s == %s\n", psize, size
+#	printf "%s == %s\n", pcorpus, corpus
+#	printf "%s == %s\n", plang, lang
+#	printf "%s == %s\n", pfact, fact
+        if ((corpus != pcorpus) || (size != psize) || (lang != plang) || (fact != pfact)) {
         	base = ""
         }
-        plang = lang
         pcorpus = corpus
+        psize = size
+        plang = lang
         pfact = fact
 
         if (meteor > 0) {
@@ -149,28 +164,27 @@ format_data () {
         }
         meteor = sprintf("%6s", meteor)
 
-        if (para ~ /.0$/) {
+        if (para ~ /\.0$/) {
         	base = bleu
         }
-		
-		delta = "--"
-		if (base) {
-			delta = bleu - base
-			if (delta == 0) {
-				delta = "--"
-			}
-			else if (delta > 0) {
-				delta = sprintf("+%.2f", delta)
-			}
-			else {
-				delta = sprintf("%.2f", delta)
-			}
-#                       delta = 100 * delta / base
-#			delta = sprint("%s%", delta)
-		}
-		delta = sprintf("%9s", delta)
 
-		print lang, corpus, fact, para, bleu, range, delta, sig, meteor
+#	print "base:", base		
+	delta = "--"
+	if (base) {
+		delta = bleu - base
+		if (delta == 0) {
+			delta = "--"
+		}
+		else if (delta > 0) {
+			delta = sprintf("+%.2f", delta)
+		}
+		else {
+			delta = sprintf("%.2f", delta)
+		}
+	}
+	delta = sprintf("%9s", delta)
+
+	print corpus, size, lang, fact, para, bleu, range, delta, sig, meteor
 	}'
 }
 
