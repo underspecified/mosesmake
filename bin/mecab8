@@ -2,9 +2,25 @@
 
 # UTF8 mecab
 mecab8 () {
-	iconv -c -s -f UTF-8 -t UJIS |
-	mecab $* |
-	iconv -c -s -f UJIS -t UTF-8
+    code=`mecab -D | grep charset:` 
+    case "$code" in
+    *utf-8*)
+		mecab $*
+    ;;
+    *UTF-8*)
+		mecab $*
+    ;;
+    *euc*)
+    	euc_io mecab $*	   
+    ;;
+    *EUC*)
+    	euc_io mecab $*	   
+    ;;
+    *)
+		echo "Uh oh!"
+		exit 1
+    ;;
+    esac
 }
 
 mecab8 $*
