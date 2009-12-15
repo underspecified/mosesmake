@@ -4,10 +4,10 @@
 mecab8 () {
     code=`mecab -D | grep charset:` 
     case "$code" in
-    *utf-8*)
+    *utf*8*)
 		/usr/bin/mecab $*
     ;;
-    *UTF-8*)
+    *UTF*8*)
 		/usr/bin/mecab $*
     ;;
     *euc*)

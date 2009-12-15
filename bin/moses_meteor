@@ -1,7 +1,8 @@
 #!/bin/bash
 
 moses_meteor () {
-    meteor.pl -s sys -t <(test2sgm.awk < $1) -r <(ref2sgm.awk < $2) --modules wn_stem
+#    meteor.pl -s sys -t <(test2sgm.awk < $1) -r <(ref2sgm.awk < $2) --modules wn_stem
+     java -jar $MHOME/bin/meteor.jar $1 $2 -m "exact stem synonym" -normalize
 }
 
 moses_meteor $*
