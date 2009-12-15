@@ -13,7 +13,7 @@ moses_translate () {
 		;;
 	esac
 	
-	cmd="moses -config $ini -input-file $input.$suf"
+	cmd="/usr/bin/moses -config $ini -input-file $input.$suf"
 	echo $cmd 1>&2
 	$cmd
 }

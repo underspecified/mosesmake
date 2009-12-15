@@ -3,7 +3,7 @@
 moses_recase () {
 	ini=$1
 	input=$2
-	recase.perl -model $ini -in $input -moses /usr/bin/moses
+	/usr/bin/recase.perl -model $ini -in $input -moses /usr/bin/moses
 }
 
 case $# in

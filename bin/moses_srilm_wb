@@ -3,7 +3,7 @@
 # 5-gram language model with Witten-Bell discounting
 # use with corpora where sparseness is a problem, such as POS-based LMs
 moses_srilm_wb () {
-	ngram-count -order 5 -interpolate -wbdiscount -text $1 -lm $2
+	/usr/bin/ngram-count -order 5 -interpolate -wbdiscount -text $1 -lm $2
 }
 
 case $# in

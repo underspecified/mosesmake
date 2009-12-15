@@ -5,16 +5,16 @@ mecab8 () {
     code=`mecab -D | grep charset:` 
     case "$code" in
     *utf-8*)
-		mecab $*
+		/usr/bin/mecab $*
     ;;
     *UTF-8*)
-		mecab $*
+		/usr/bin/mecab $*
     ;;
     *euc*)
-    	euc_io mecab $*	   
+    	euc_io /usr/bin/mecab $*	   
     ;;
     *EUC*)
-    	euc_io mecab $*	   
+    	euc_io /usr/bin/mecab $*	   
     ;;
     *)
 		echo "Uh oh!"

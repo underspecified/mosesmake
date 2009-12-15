@@ -6,7 +6,7 @@ moses_eval_sig () {
 	tgt2=$3
 	
 	echo '*** BLEU score for document ***'
-	command_doc="doc_bleu.rb $tgt1 $ref"
+	command_doc="/usr/bin/doc_bleu.rb $tgt1 $ref"
 	echo $command_doc
 	$command_doc
 	
@@ -19,7 +19,7 @@ moses_eval_sig () {
 	echo
 	echo '*** Confidence Interval ***'
 	r1=$RANDOM
-	command_confiv="confiv.rb $r1 $samples 95 $tgt1 $ref"
+	command_confiv="/usr/bin/confiv.rb $r1 $samples 95 $tgt1 $ref"
 	echo $command_confiv
 	$command_confiv
 	
@@ -34,7 +34,7 @@ moses_eval_sig () {
 		echo
 		echo '*** Bootstrap testing ***'
 		r3=$RANDOM
-		command_bootstrap="bootstrap.rb $r3 $samples $tgt1 $tgt2 $ref"
+		command_bootstrap="/usr/bin/bootstrap.rb $r3 $samples $tgt1 $tgt2 $ref"
 		echo $command_bootstrap
 		$command_bootstrap
 	fi

@@ -10,7 +10,7 @@ moses_mert () {
 		flags="--continue"
 	fi
 	
-	cmd="mert-moses.pl $flags $tuning_dir/$input_tok $tuning_dir/$ref_tok /usr/bin/moses $ini --working-dir $tuning_dir --rootdir /usr/share/moses/scripts"
+	cmd="/usr/bin/mert-moses.pl $flags $tuning_dir/$input_tok $tuning_dir/$ref_tok /usr/bin/moses $ini --working-dir $tuning_dir --rootdir /usr/share/moses/scripts"
 	echo $cmd
 	$cmd
 }

@@ -3,7 +3,7 @@
 # 5-gram language model with Chen and Goodman's modified Kneser-Ney discounting
 # this is the default smooting method for making LMs
 moses_srilm_kn () {
-	ngram-count -order 5 -interpolate -kndiscount -text $1 -lm $2
+	/usr/bin/ngram-count -order 5 -interpolate -kndiscount -text $1 -lm $2
 }
 
 case $# in

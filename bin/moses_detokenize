@@ -3,10 +3,10 @@
 moses_detokenize () {
 	case "$1" in
 		en|fr|cs)
-			detokenizer.perl -l $1
+			/usr/bin/detokenizer.perl -l $1
 		;;
 		*)
-			detokenizer.perl
+			/usr/bin/detokenizer.perl
 		;;
 	esac
 }

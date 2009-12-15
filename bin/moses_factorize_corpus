@@ -89,7 +89,7 @@ moses_fact2tok_pos () {
 }
 
 moses_tok_pos2morph () {
-	morpha -a |
+	/usr/bin/morpha -a |
 	awk '
 	{
 		for (i=1; i<=NF; i++) {
@@ -132,7 +132,7 @@ moses_add_morph_en () {
 
 moses_factorize_corpus_en () {
 	iconv -c -f utf-8 -t iso-8859-15 |
-	tag_with_eos tree-tagger-english 2>/dev/null |
+	tag_with_eos /usr/bin/tree-tagger-english 2>/dev/null |
 	iconv -c -f iso-8859-15 -t utf-8 |
 	awk '
 	BEGIN {
@@ -152,7 +152,7 @@ moses_factorize_corpus_en () {
 
 moses_factorize_corpus_it () {
 	iconv -c -f utf-8 -t iso-8859-15 |
-	tag_with_eos tree-tagger-italian 2>/dev/null |
+	tag_with_eos /usr/bin/tree-tagger-italian 2>/dev/null |
 	iconv -c -f iso-8859-15 -t utf-8 |
 	awk '
 	BEGIN {
@@ -171,7 +171,7 @@ moses_factorize_corpus_it () {
 
 moses_factorize_corpus_es () {
 	iconv -c -f utf-8 -t iso-8859-15 |
-	tag_with_eos tree-tagger-spanish 2>/dev/null |
+	tag_with_eos /usr/bin/tree-tagger-spanish 2>/dev/null |
 	iconv -c -f iso-8859-15 -t utf-8 |
 	awk '
 	BEGIN {
