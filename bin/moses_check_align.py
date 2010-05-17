@@ -34,29 +34,27 @@ def different_lengths(files, items):
    else:
       return False
 
-def less_than_min(files, line_num, items):
-   '''Print an error message and return True if any line in items has
-   a length less than min.'''
-   lengths = [len(i.split()) for i in items]
-   if filter(lambda l: l <= options.min, lengths):
-      print >>sys.stderr, "ERROR! line lengths are less than min (%d)!" % \
+def less_than_min(file, line_num, line):
+   '''Print an error message and return True if a line has a length
+   less than min.'''
+   length = len(line.split())
+   if length <= 0 or length < options.min:
+      print >>sys.stderr, "ERROR! line length is less than min (%d)!" % \
           options.min
-      for f, l, i in zip(files, lengths, items):
-         print >>sys.stderr, "%s (%d): %s" % (f, line_num, l, i)
+      print >>sys.stderr, "%s:%d: (%d): %s" % (file, line_num, length, line)
       print >>sys.stderr, ''
       return True
    else:
       return False
 
-def greater_than_max(files, line_num, items):
-   '''Print an error message and return True if any line in items has
-   a length greater than max.'''
-   lengths = [len(i.split()) for i in items]
-   if filter(lambda l: l > options.max, lengths):
-      print >>sys.stderr, "ERROR! line lengths are greater than max (%d)!" \
-          % options.max
-      for f, l, i in zip(files, lengths, items):
-         print >>sys.stderr, "%s:%d (%d): %s" % (f, line_num, l, i)
+def greater_than_max(file, line_num, line):
+   '''Print an error message and return True if a line has a length
+   less than min.'''
+   length = len(line.split())
+   if length > options.max:
+      print >>sys.stderr, "ERROR! line length is greater than max (%d)!" % \
+          options.min
+      print >>sys.stderr, "%s:%d: (%d): %s" % (file, line_num, length, line)
       print >>sys.stderr, ''
       return True
    else:
@@ -70,11 +68,14 @@ def check_files(files):
       items = [[l.strip() for l in open(f).readlines()] for f in files]
       if different_lengths(files, items):
          exit_code = 1
-      else:
-         items = zip(*items)
-         for n, d in enumerate(items):
-            if less_than_min(files, n, d) or greater_than_max(files, n, d):
+      items = zip(*items)
+      for n, data in enumerate(items):
+         for m, l in enumerate(data):
+            f = files[m]
+            if less_than_min(f, n, l) or greater_than_max(f, n, l):
                exit_code = 1
+   else:
+      exit_code = 1
    return exit_code
 
 def setup_opts():

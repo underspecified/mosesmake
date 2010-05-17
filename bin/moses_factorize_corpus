@@ -3,7 +3,7 @@
 eos_record2line () {
 	awk '
 	BEGIN {
-		RS = "EOS"
+		RS = "###EOS###"
 		ORS = ""
 	}
 	{
@@ -20,7 +20,8 @@ moses_factorize_corpus_mecab () {
 	mecab8 -F'%m|%f[6]|%F-[0,1]|%F-[4,5]___' |
 	sed 's/___/ /g
 		 s/| /|NULL /g
-		 s/EOS$//g'
+		 s/ EOS$//g
+		 s/^EOS$//g'
 }
 
 moses_factorize_corpus_juman () {
@@ -131,9 +132,9 @@ moses_add_morph_en () {
 }
 
 moses_factorize_corpus_en () {
-	iconv -c -f utf-8 -t iso-8859-15 |
+	utf2iso |
 	tag_with_eos /usr/bin/tree-tagger-english 2>/dev/null |
-	iconv -c -f iso-8859-15 -t utf-8 |
+	iso2utf |
 	awk '
 	BEGIN {
 		FS = "\t"
@@ -145,15 +146,15 @@ moses_factorize_corpus_en () {
 		lemma = $3
 		print surface, lemma, pos
 	}
-	/^EOS$/' |
+	/^###EOS###$/' |
 	eos_record2line |
 	moses_add_morph_en
 }
 
 moses_factorize_corpus_it () {
-	iconv -c -f utf-8 -t iso-8859-15 |
+	uft2iso |
 	tag_with_eos /usr/bin/tree-tagger-italian 2>/dev/null |
-	iconv -c -f iso-8859-15 -t utf-8 |
+	iso2utf |
 	awk '
 	BEGIN {
 		FS = "\t"
@@ -165,14 +166,14 @@ moses_factorize_corpus_it () {
 		lemma = $3
 		print surface, lemma, pos
 	}
-	/^EOS$/' |
+	/^###EOS###$/' |
 	eos_record2line
 }
 
 moses_factorize_corpus_es () {
-	iconv -c -f utf-8 -t iso-8859-15 |
+	utf2iso |
 	tag_with_eos /usr/bin/tree-tagger-spanish 2>/dev/null |
-	iconv -c -f iso-8859-15 -t utf-8 |
+	iso2utf |
 	awk '
 	BEGIN {
 		FS = "\t"
@@ -184,7 +185,7 @@ moses_factorize_corpus_es () {
 		lemma = $3
 		print surface, lemma, pos
 	}
-	/^EOS$/' |
+	/^###EOS###$/' |
 	eos_record2line
 }
 

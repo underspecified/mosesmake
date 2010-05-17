@@ -5,12 +5,12 @@ tag_with_eos () {
 	awk '
 	{
 		print
-		print "EOS"
+		print "###EOS###"
 	}' |
 	exec $cmd |
 	awk '
-	/EOS/ {
-		print "EOS"
+	/###EOS###/ {
+		print "###EOS###"
 		next
 	}
 	{
