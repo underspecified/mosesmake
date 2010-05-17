@@ -53,7 +53,7 @@ def greater_than_max(file, line_num, line):
    length = len(line.split())
    if length > options.max:
       print >>sys.stderr, "ERROR! line length is greater than max (%d)!" % \
-          options.min
+          options.max
       print >>sys.stderr, "%s:%d: (%d): %s" % (file, line_num, length, line)
       print >>sys.stderr, ''
       return True
