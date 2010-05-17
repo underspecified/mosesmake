@@ -3,7 +3,11 @@
 include ../Makefile.vars
 
 all:	$(corpus).train.tok.$(src) $(corpus).train.lemma.$(src) $(corpus).train.pos.$(src) \
-	$(corpus).train.tok.$(tgt) $(corpus).train.lemma.$(tgt) $(corpus).train.pos.$(tgt)
+	$(corpus).train.tok.$(tgt) $(corpus).train.lemma.$(tgt) $(corpus).train.pos.$(tgt) \
+	check
+
+check:	$(corpus).train.tok.$(src) $(corpus).train.tok.$(tgt)
+	moses_check_align.py --min=$(min) --max=$(max) $^
 
 nuke:	clean
 	rm -f $(corpus).train.$(src) $(corpus).train.$(tgt)
