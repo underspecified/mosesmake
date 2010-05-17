@@ -6,7 +6,8 @@ clean:
 	rm -f *.clean.* *.fact.* *.lc.* *.tok.* *.pos.*
 
 %.clean.$(src) %.clean.$(tgt):	%.$(src) %.$(tgt)
-	moses_filter $* $(src) $(tgt) $*.clean $(min) $(max)
+	(moses_filter $* $(src) $(tgt) $*.clean $(min) $(max) && \
+	moses_check_align.py --min=$(min) --max=$(max) $@)
 
 %.fact.$(src):	%.clean.$(src)
 	moses_factorize_corpus $(src) < $< > $@

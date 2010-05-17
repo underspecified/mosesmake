@@ -2,7 +2,8 @@
 
 include ../Makefile.vars
 
-all:	$(corpus).test.mert.output.bleu \
+all:	check \
+	$(corpus).test.mert.output.bleu \
 	$(corpus).test.mert.output.meteor \
 	$(corpus).test.mert.output.sig \
 	$(corpus).test.no_mert.output.bleu \
@@ -11,6 +12,9 @@ all:	$(corpus).test.mert.output.bleu \
 
 nuke:	clean
 	rm -rf filtered.* *.bleu *.detok *.rc *.output* *.sig
+
+check:	$(corpus).test.input $(corpus).test.reference
+	moses_check_align.py --min=0 --max=1000 $^
 
 filtered.mert/moses.ini:	../tuning/moses.weight-reused.ini \
 							$(corpus).test.input.lc

@@ -2,9 +2,12 @@
 
 include ../Makefile.vars
 
-all:	moses.weight-reused.ini
+all:	check moses.weight-reused.ini
 
 nuke:	clean
+
+check:	$(corpus).dev.input.tok $(corpus).dev.reference.tok
+	moses_check_align.py --min=0 --max=1000 $^
 
 moses.weight-reused.ini:	../model/moses.ini moses.ini
 	reuse-weights.perl moses.ini < ../model/moses.ini > $@
@@ -24,4 +27,4 @@ $(corpus).dev.reference:	$(dev_tgt_file)
 
 include $(MHOME)/makefiles/Makefile.fact
 
-.PHONY:	all nuke
+.PHONY:	all nuke check
