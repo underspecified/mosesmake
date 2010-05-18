@@ -7,7 +7,8 @@ clean:
 
 %.clean.$(src) %.clean.$(tgt):	%.$(src) %.$(tgt)
 	(moses_filter $* $(src) $(tgt) $*.clean $(min) $(max) && \
-	moses_check_align.py --min=$(min) --max=$(max) $*.clean.*)
+	moses_check_align.py --min=$(min) --max=$(max) --ratio=$(max) \
+		$*.clean.*)
 
 %.fact.$(src):	%.clean.$(src)
 	moses_factorize_corpus $(src) < $< > $@

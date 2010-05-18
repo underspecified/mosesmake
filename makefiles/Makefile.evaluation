@@ -14,7 +14,7 @@ nuke:	clean
 	rm -rf filtered.* *.bleu *.detok *.rc *.output* *.sig
 
 check:	$(corpus).test.input $(corpus).test.reference
-	moses_check_align.py --min=0 --max=1000 $^
+	moses_check_align.py --min=0 --max=1000 --ratio=1000 $^
 
 filtered.mert/moses.ini:	../tuning/moses.weight-reused.ini \
 							$(corpus).test.input.lc

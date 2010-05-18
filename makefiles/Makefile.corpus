@@ -7,7 +7,7 @@ all:	$(corpus).train.tok.$(src) $(corpus).train.lemma.$(src) $(corpus).train.pos
 	check
 
 check:	$(corpus).train.tok.$(src) $(corpus).train.tok.$(tgt)
-	moses_check_align.py --min=$(min) --max=$(max) $^
+	moses_check_align.py --min=$(min) --max=$(max) --ratio=1000 $^
 
 nuke:	clean
 	rm -f $(corpus).train.$(src) $(corpus).train.$(tgt)
