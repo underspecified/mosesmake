@@ -99,10 +99,8 @@ def check_files(files):
    exit_code = 0
    if files:
       items = [[l.strip() for l in open(f).readlines()] for f in files]
-      if different_lengths(files, items):
-         exit_code = 1
-      items = zip(*items)
-      for n, lines in enumerate(items):
+      zitems = zip(*items)
+      for n, lines in enumerate(zitems):
          data = zip(files, lines)
          for f, l in data:
             if less_than_min(f, l, n) or greater_than_max(f, l, n):
@@ -110,6 +108,8 @@ def check_files(files):
          for (f1, l1), (f2, l2) in itertools.combinations(data, 2):
             if bad_ratio(f1, l1, f2, l2, n):
                exit_code = 1
+      if different_lengths(files, items):
+         exit_code = 1
    else:
       exit_code = 1
    return exit_code
