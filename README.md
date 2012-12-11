@@ -1,6 +1,5 @@
 # Moses Make
 
-Makefile utilities for rapid deployment of Moses SMT systems
 Author: Eric Nichols <ericnichols79@gmail.com>, Tohoku University, Japan
 
 Moses Make is a set of makefiles and utilities for automatic setup of Moses SMT systems. Moses Make will tokenize and annotate data with POS, lemma form, and morphology factors. Currently, Moses Make supports English, Italian, Japanese, and Spanish, but it can easily be extended to support any language with a POS tagger and morphological analyzer.
