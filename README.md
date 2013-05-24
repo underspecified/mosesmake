@@ -43,8 +43,8 @@ Add the following to your .bashrc. Skip this step if you installed via apt-get.
 
 	# Makefile-based automation of Moses SMT system construction
 	MTHOME=/path/to/mosesmake
-	if [ -f $DTHOME/setup.sh ]; then
-		. $DTHOME/setup.sh
+	if [ -f $MTHOME/setup.sh ]; then
+		. $MTHOME/setup.sh
 	fi
 
 ## TESTING MOSES MAKE
