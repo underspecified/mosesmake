@@ -6,14 +6,14 @@ all:	check moses.weight-reused.ini
 
 nuke:	clean
 
-check:	$(corpus).dev.input.tok $(corpus).dev.reference.tok
+check:	$(corpus).dev.input.fact.lc.tok $(corpus).dev.reference.fact.lc.tok
 	moses_check_align.py --min=0 --max=1000 --ratio=1000 $^
 
 moses.weight-reused.ini:	../model/moses.ini moses.ini
 	reuse-weights.perl moses.ini < ../model/moses.ini > $@
 
 moses.ini:	../model/moses.ini \
-			$(corpus).dev.input.tok $(corpus).dev.reference.tok
+			$(corpus).dev.input.fact.lc.tok $(corpus).dev.reference.fact.lc.tok
 	moses_mert `pwd` $^
 
 $(corpus).dev.input:	$(dev_src_file)

@@ -7,7 +7,7 @@ all:	corpus lm model recaser tuning evaluation
 nuke:
 	rm -rf corpus evaluation giza.* lm model tuning
 
-%/Makefile:	/usr/share/mosesmake/makefiles/Makefile.%
+%/Makefile:	$(MHOME)/makefiles/Makefile.%
 	mkdir -p $*
 	cp -f $< $@
 #	make -C $*
@@ -24,7 +24,7 @@ evaluation/%:	evaluation/Makefile
 
 recaser:	$(recaser_dir)/moses.ini
 
-$(recaser_dir)/Makefile:	/usr/share/mosesmake/makefiles/Makefile.recaser.in
+$(recaser_dir)/Makefile:	$(MHOME)/makefiles/Makefile.recaser.in
 	mkdir -p $(recaser_dir)
 	echo "#!/usr/bin/make" > $@
 	echo "" > $@
@@ -39,16 +39,17 @@ $(recaser_dir)/%:	$(recaser_dir)/Makefile
 
 model:	model/moses.ini
 
-model/moses.ini:	corpus/$(corpus).train.lc.$(src) corpus/$(corpus).train.lc.$(tgt) \
-					lm/$(lm_corpus).surface.lm lm/$(lm_corpus).pos.lm
+model/moses.ini:	corpus/$(corpus).train.fact.lc.tok.$(src) \
+			corpus/$(corpus).train.fact.lc.tok.$(tgt) \
+			lm/$(lm_corpus).fact.lc.tok.lm lm/$(lm_corpus).fact.lc.pos.lm
 	mkdir -p model
-	moses_train_am `pwd` corpus/$(corpus).train.lc $(src) $(tgt) `pwd`/lm/$(lm_corpus).surface.lm `pwd`/lm/$(lm_corpus).pos.lm $(factors)
+	moses_train_am `pwd` corpus/$(corpus).train $(src) $(tgt) `pwd`/lm/$(lm_corpus).fact.lc.tok.lm `pwd`/lm/$(lm_corpus).fact.lc.pos.lm $(factors)
 
 lm:	lm/all
 
 lm/%:	lm/Makefile
 	make -C lm $*
-	
+
 corpus:	corpus/all
 
 corpus/%:	corpus/Makefile

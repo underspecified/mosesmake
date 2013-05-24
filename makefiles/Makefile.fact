@@ -25,40 +25,40 @@ $(lm_corpus).fact:	$(lm_corpus)
 %.reference.fact:	%.reference
 	moses_factorize_corpus $(tgt) < $< > $@
 
-%.lc.$(src):	%.fact.$(src)
+%.fact.lc.$(src):	%.fact.$(src)
 	moses_lowercase < $< > $@
 
-%.lc.$(tgt):	%.fact.$(tgt)
+%.fact.lc.$(tgt):	%.fact.$(tgt)
 	moses_lowercase < $< > $@
 
-%.lc:	%.fact
+%.fact.lc:	%.fact
 	moses_lowercase < $< > $@
 
-%.tok.$(src):	%.lc.$(src)
+%.lc.tok.$(src):	%.lc.$(src)
 	moses_fact2tok < $< > $@
 
-%.tok.$(tgt):	%.lc.$(tgt)
+%.lc.tok.$(tgt):	%.lc.$(tgt)
 	moses_fact2tok < $< > $@
 
-%.tok:	%.lc
+%.lc.tok:	%.lc
 	moses_fact2tok < $< > $@
 
-%.lemma.$(src):	%.lc.$(src)
+%.lc.lemma.$(src):	%.lc.$(src)
 	moses_fact2lemma < $< > $@
 
-%.lemma.$(tgt):	%.lc.$(tgt)
+%.lc.lemma.$(tgt):	%.lc.$(tgt)
 	moses_fact2lemma < $< > $@
 
-%.lemma:	%.lc
+%.lc.lemma:	%.lc
 	moses_fact2lemma < $< > $@
 
-%.pos.$(src):	%.lc.$(src)
+%.lc.pos.$(src):	%.lc.$(src)
 	moses_fact2pos < $< > $@	
 
-%.pos.$(tgt):	%.lc.$(tgt)
+%.lc.pos.$(tgt):	%.lc.$(tgt)
 	moses_fact2pos < $< > $@	
 
-%.pos:	%.lc
+%.lc.pos:	%.lc
 	moses_fact2pos < $< > $@	
 
 

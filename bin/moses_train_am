@@ -5,32 +5,32 @@ moses_train_am () {
 	train=$2
 	src=$3
 	tgt=$4
-	surface_lm=$5
+	tok_lm=$5
 	pos_lm=$6
 	factors=$7
 	
 	case $factors in
 		factorless)
-			cmd="/usr/bin/train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.tok -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0"
+			cmd="/usr/bin/train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.fact.lc.tok -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$tok_lm:0"
 		;;
 		pos)
-			cmd="/usr/bin/train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 0-0,2"
+			cmd="/usr/bin/train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.fact.lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$tok_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 0-0,2"
 		;;
 		pos-gen)
-			cmd="/usr/bin/train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 0-0 --generation-factors 0-2 --decoding-steps t0,g0"
+			cmd="/usr/bin/train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.fact.lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$tok_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 0-0 --generation-factors 0-2 --decoding-steps t0,g0"
 		;;
 		lemma)
-			cmd="/usr/bin/train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.lemma -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0"
+			cmd="/usr/bin/train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.fact.lc.lemma -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$tok_lm:0"
 		;;
 		lemma+pos+morph)
-			cmd="/usr/bin/train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 1-1+2,3-2 --generation-factors 1-2+1,2-0 --decoding-steps t0,g0,t1,g1"
+			cmd="/usr/bin/train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.fact.lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$tok_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 1-1+2,3-2 --generation-factors 1-2+1,2-0 --decoding-steps t0,g0,t1,g1"
 		;;
-		surface+lemma+pos+morph)
-			cmd="/usr/bin/train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$surface_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 1-1+3-2+0-0,2 --generation-factors 1-2+1,2-0 --decoding-steps t0,g0,t1,g1:t2"
+		tok+lemma+pos+morph)
+			cmd="/usr/bin/train-factored-phrase-model.perl -scripts-root-dir /usr/share/moses/scripts -root-dir $system -corpus $train.fact.lc -f $src -e $tgt -alignment grow-diag-final-and -reordering msd-bidirectional-fe -lm 0:5:$tok_lm:0 -lm 2:5:$pos_lm:0 --translation-factors 1-1+3-2+0-0,2 --generation-factors 1-2+1,2-0 --decoding-steps t0,g0,t1,g1:t2"
 		;;
 		*)
 			echo "unknown factors: $factors" 1>&2
-			echo "supported factors: factorless pos pos-gen lemma+pos+morph surface+lemma+pos+morph" 1>&2
+			echo "supported factors: factorless pos pos-gen lemma+pos+morph tok+lemma+pos+morph" 1>&2
 			exit 2
 		;;
 	esac
@@ -44,7 +44,7 @@ case $# in
 		moses_train_am $*
 	;;
 	*)
-		echo "usage: moses_train_am <system_root> <training_corpus> <src_language> <target_language> <surface_lm> <pos_lm> <factors>" 1>&2
+		echo "usage: moses_train_am <system_root> <training_corpus> <src_language> <target_language> <tok_lm> <pos_lm> <factors>" 1>&2
 		exit 1
 	;;
 esac

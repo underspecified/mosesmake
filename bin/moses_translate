@@ -5,11 +5,11 @@ moses_translate () {
 	ini=$2
 	
 	case "$factors" in
-		surface+lemma+pos|surface+lemma+pos+morph)
-			suf=lc
+		tok+lemma+pos|tok+lemma+pos+morph)
+			suf=fact.lc
 		;;
 		*)
-			suf=tok
+			suf=fact.lc.tok
 		;;
 	esac
 	

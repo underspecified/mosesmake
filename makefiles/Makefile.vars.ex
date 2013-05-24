@@ -1,7 +1,7 @@
 #!/usr/bin/make
 
 ### REQUIRED VARIABLES ###
-#factors = factorless pos pos-gen lemma+pos+morph surface+lemma+pos+morph
+#factors = factorless pos pos-gen lemma+pos+morph tok+lemma+pos+morph
 factors = pos-gen
 src = ja
 tgt = en

@@ -2,11 +2,11 @@
 
 include ../Makefile.vars
 
-all:	$(corpus).train.tok.$(src) $(corpus).train.lemma.$(src) $(corpus).train.pos.$(src) \
-	$(corpus).train.tok.$(tgt) $(corpus).train.lemma.$(tgt) $(corpus).train.pos.$(tgt) \
-	check
+all:	$(corpus).train.fact.lc.tok.$(src) $(corpus).train.fact.lc.tok.$(tgt) \
+	$(corpus).train.fact.lc.lemma.$(src) $(corpus).train.fact.lc.lemma.$(tgt) \
+	$(corpus).train.fact.lc.pos.$(src) $(corpus).train.fact.lc.pos.$(tgt)
 
-check:	$(corpus).train.tok.$(src) $(corpus).train.tok.$(tgt)
+check:	$(corpus).train.fact.lc.tok.$(src) $(corpus).train.fact.lc.tok.$(tgt)
 	moses_check_align.py --min=$(min) --max=$(max) --ratio=1000 $^
 
 nuke:	clean

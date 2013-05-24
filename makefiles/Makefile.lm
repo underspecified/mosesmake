@@ -2,14 +2,14 @@
 
 include ../Makefile.vars
 
-all:	$(lm_corpus).surface.lm $(lm_corpus).pos.lm
+all:	$(lm_corpus).fact.lc.tok.lm $(lm_corpus).fact.lc.pos.lm
 
 nuke:	clean
 	rm -f *.lm
 
-%.surface.lm:	%.tok
+%.tok.lm:	%.tok
 	moses_srilm_kn $< $@
-	
+
 %.pos.lm:	%.pos
 	moses_srilm_wb $< $@
 

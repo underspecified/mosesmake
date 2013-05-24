@@ -4,10 +4,10 @@ include ../Makefile.vars
 
 all:	check \
 	$(corpus).test.mert.output.bleu \
-	$(corpus).test.mert.output.meteor \
+	#$(corpus).test.mert.output.meteor \
 	$(corpus).test.mert.output.sig \
 	$(corpus).test.no_mert.output.bleu \
-	$(corpus).test.no_mert.output.meteor \
+	#$(corpus).test.no_mert.output.meteor \
 	$(corpus).test.no_mert.output.sig
 
 nuke:	clean
@@ -17,11 +17,11 @@ check:	$(corpus).test.input $(corpus).test.reference
 	moses_check_align.py --min=0 --max=1000 --ratio=1000 $^
 
 filtered.mert/moses.ini:	../tuning/moses.weight-reused.ini \
-							$(corpus).test.input.lc
+							$(corpus).test.input.fact.lc
 	filter-model-given-input.pl filtered.mert $^
 
 filtered.no_mert/moses.ini:	../model/moses.ini \
-							$(corpus).test.input.lc
+							$(corpus).test.input.fact.lc
 	filter-model-given-input.pl filtered.no_mert $^
 
 $(corpus).test.input:	$(test_src_file)
@@ -30,33 +30,33 @@ $(corpus).test.input:	$(test_src_file)
 $(corpus).test.reference:	$(test_tgt_file)
 	cp -f $< $@
 
-%.no_mert.output.meteor:   %.no_mert.output.detok %.reference
+%.no_mert.output.meteor:   %.no_mert.output.rc.detok %.reference
+	moses_meteor $^ | tee $@r
+
+%.mert.output.meteor:   %.mert.output.rc.detok %.reference
 	moses_meteor $^ | tee $@
 
-%.mert.output.meteor:   %.mert.output.detok %.reference
-	moses_meteor $^ | tee $@
-
-%.no_mert.output.sig:	%.no_mert.output.detok %.reference \
+%.no_mert.output.sig:	%.no_mert.output.rc.detok %.reference \
 						$(baseline_no_mert)
 	moses_eval_sig -s $(samples) $^ | tee $@
 
-%.mert.output.sig:	%.mert.output.detok %.reference \
+%.mert.output.sig:	%.mert.output.rc.detok %.reference \
 					$(baseline_mert)
 	moses_eval_sig -s $(samples) $^ | tee $@
- 
-%.no_mert.output.bleu:	%.reference %.no_mert.output.detok
+
+%.no_mert.output.bleu:	%.reference %.no_mert.output.rc.detok
 	moses_bleu $^ | tee $@
 
-%.mert.output.bleu:	%.reference %.mert.output.detok
+%.mert.output.bleu:	%.reference %.mert.output.rc.detok
 	moses_bleu $^ | tee $@
 
-$(corpus).test.no_mert.output.fact:	$(corpus).test.input.tok filtered.no_mert/moses.ini
+$(corpus).test.no_mert.output.fact:	$(corpus).test.input.fact.lc.tok filtered.no_mert/moses.ini
 	moses_translate $(corpus).test.input filtered.no_mert/moses.ini $(factors) > $@
 
-$(corpus).test.mert.output.fact:	$(corpus).test.input.tok filtered.mert/moses.ini
+$(corpus).test.mert.output.fact:	$(corpus).test.input.fact.lc.tok filtered.mert/moses.ini
 	moses_translate $(corpus).test.input filtered.mert/moses.ini $(factors) > $@
 
-%.detok:	%.rc
+%.rc.detok:	%.rc
 	moses_detokenize $(tgt) < $< > $@
 
 %.rc:	$(recaser_dir)/moses.ini %
