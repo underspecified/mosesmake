@@ -1,7 +1,7 @@
 #!/bin/bash
 
 utf2iso () {
-	tcs -s -f utf-8 -t iso-8859-15
+	iconv -s -f utf-8 -t iso-8859-15
 }
 
 utf2iso

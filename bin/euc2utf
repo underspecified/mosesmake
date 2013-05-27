@@ -1,7 +1,7 @@
 #!/bin/bash
 
 euc2utf () {
-	tcs -s -f euc-jp -t utf-8
+       iconv -s -f euc-jp -t utf-8
 }
 
 euc2utf
