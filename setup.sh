@@ -10,9 +10,8 @@
 ## fi
 
 
-MHOME=`dirname $0`
-PATH=$MHOME/bin:$PATH
-export MHOME PATH
+#export MHOME=$(cd `dirname $0` && pwd)
+export PATH=$MHOME/bin:$PATH
 
 if [ `uname` = Darwin ]; then
 	. $MHOME/env/Darwin.env

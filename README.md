@@ -42,9 +42,9 @@ Run the following commands as root setting $distro to your Ubuntu distribution n
 Add the following to your .bashrc. Skip this step if you installed via apt-get.
 
 	# Makefile-based automation of Moses SMT system construction
-	MTHOME=/path/to/mosesmake
-	if [ -f $MTHOME/setup.sh ]; then
-		. $MTHOME/setup.sh
+	MHOME=/path/to/mosesmake
+	if [ -f $MHOME/setup.sh ]; then
+		. $MHOME/setup.sh
 	fi
 
 ## TESTING MOSES MAKE
